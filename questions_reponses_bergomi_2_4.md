@@ -1,0 +1,481 @@
+# Questions-réponses sur Bergomi 2.4 -- de la volatilité locale à la volatilité implicite
+
+Ce document regroupe des questions typiques d'oral ou d'examen, avec des réponses rigoureuses et synthétiques.
+
+---
+
+## 1) Quel est l'objectif du chapitre 2.4 de Bergomi ?
+
+**Réponse.**  
+Le chapitre 2.4 cherche à comprendre comment une fonction de volatilité locale
+\[
+\sigma_{\mathrm{loc}}(t,S)
+\]
+se traduit en une surface de volatilité implicite
+\[
+\hat\sigma(K,T).
+\]
+Dupire permet d'aller de la surface implicite vers la local vol. Bergomi fait ici le chemin inverse, au moins de manière exacte sous forme implicite, puis de manière approchée sous forme exploitable.
+
+---
+
+## 2) Quelle est l'identité exacte fondamentale obtenue au début du chapitre ?
+
+**Réponse.**  
+L'identité fondamentale est
+\[
+\hat\sigma_{K,T}^{\,2}
+=
+\frac{
+\mathbb E^{\mathrm{loc}}
+\!\left[
+\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}(\hat\sigma_{K,T})
+\sigma_{\mathrm{loc}}^2(t,S_t)\,dt
+\right]
+}{
+\mathbb E^{\mathrm{loc}}
+\!\left[
+\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}(\hat\sigma_{K,T})\,dt
+\right]
+}.
+\]
+Elle dit que la variance implicite est une moyenne pondérée de la variance locale.
+
+---
+
+## 3) Pourquoi dit-on "moyenne pondérée" ?
+
+**Réponse.**  
+Parce que la formule s'écrit sous la forme
+\[
+\hat\sigma^2=\frac{\mathbb E\left[\int_0^T w_t\,\sigma_{\mathrm{loc}}^2(t,S_t)\,dt\right]}
+{\mathbb E\left[\int_0^T w_t\,dt\right]},
+\qquad
+w_t=e^{-rt}S_t^2\Gamma_t.
+\]
+Les poids sont positifs pour une option vanille convexe, et ils mesurent l'importance des instants et des états où l'option est la plus sensible au sous-jacent.
+
+---
+
+## 4) Pourquoi le poids est-il un dollar gamma ?
+
+**Réponse.**  
+Le terme \(S_t^2\Gamma_t\) apparaît naturellement quand on écrit le P\&L d'une stratégie de couverture delta. Le coût de mauvaise spécification de la volatilité instantanée se lit dans le terme gamma/theta, et c'est ce terme qui pondère l'écart entre la variance vraie et la variance du modèle de base.
+
+---
+
+## 5) La formule exacte donne-t-elle directement \(\hat\sigma\) ?
+
+**Réponse.**  
+Non. Elle donne exactement \(\hat\sigma^2\), mais de manière implicite, car \(\hat\sigma\) apparaît aussi dans les poids \(\Gamma^{BS}(\hat\sigma)\). C'est pourquoi Bergomi développe ensuite une approximation d'ordre 1.
+
+---
+
+## 6) Quel est le rôle du modèle de base dans la démonstration ?
+
+**Réponse.**  
+On choisit un modèle de base \(P_1\) pour couvrir delta une option dont la dynamique réelle suit un autre modèle \(P_2\). L'écart entre les deux prix est donné par l'espérance du P\&L gamma/theta accumulé. En choisissant judicieusement le modèle de base, on obtient des identités exactes reliant volatilité locale et volatilité implicite.
+
+---
+
+## 7) Quel lien avec Dupire ?
+
+**Réponse.**  
+Dupire fournit
+\[
+\sigma_{\mathrm{loc}}^2(T,K)
+=
+\frac{\partial_T C(T,K)+(r-q)K\partial_K C(T,K)+qC(T,K)}
+\frac12 K^2\partial_{KK}C(T,K)}.
+\]
+Il s'agit d'une formule explicite de \(\sigma_{\mathrm{loc}}\) en fonction de la surface vanille. Le chapitre 2.4 étudie le problème dual : sachant \(\sigma_{\mathrm{loc}}\), quel smile implicite obtient-on ?
+
+---
+
+## 8) Pourquoi l'approximation "faiblement locale" est-elle introduite ?
+
+**Réponse.**  
+Parce que la formule exacte est peu maniable. On suppose
+\[
+\sigma_{\mathrm{loc}}(t,S)=\sigma_0+\delta\sigma(t,S)
+\]
+ou, plus généralement,
+\[
+u(t,S)=u_0(t)+\delta u(t,S),
+\qquad u=\sigma_{\mathrm{loc}}^2,
+\]
+avec perturbation petite. On peut alors figer la densité au modèle de base et obtenir une formule explicite à l'ordre 1.
+
+---
+
+## 9) Quelle est la formule approchée obtenue à l'ordre 1 autour d'une volatilité constante ?
+
+**Réponse.**  
+On obtient
+\[
+\hat\sigma_{K,T}
+\approx
+\frac1T\int_0^Tdt\int_{\mathbb R}\phi(y)\,
+\sigma_{\mathrm{loc}}\!\left(
+t,\,
+F_t\exp\!\left(
+\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
+\right)
+\right)dy.
+\]
+Cette formule exprime l'implicite comme moyenne gaussienne de la local vol.
+
+---
+
+## 10) Que représente la variable \(y\) ?
+
+**Réponse.**  
+\(y\) est une variable gaussienne centrée réduite issue de la convolution de la densité lognormale du sous-jacent à l'instant \(t\) avec la gamma Black-Scholes de l'option de maturité \(T\). Elle indexe les différentes trajectoires intermédiaires possibles entre \(S_0\) et \(K\).
+
+---
+
+## 11) Quelle est l'interprétation du terme
+\[
+S(t,y)=F_t\exp\!\left(\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y\right)?
+\]
+
+**Réponse.**  
+Il s'agit du niveau de spot intermédiaire exploré à la date \(t\) dans l'approximation.  
+Le terme \(\frac{t}{T}x_K\) relie linéairement le point de départ \(S_0\) au point terminal \(K\) en log-espace. Le terme en \(y\) décrit la dispersion autour de cette trajectoire centrale.
+
+---
+
+## 12) Pourquoi le chemin \(y=0\) est-il important ?
+
+**Réponse.**  
+Parce qu'il correspond au chemin "le plus probable" dans cette approximation. On obtient alors
+\[
+\hat\sigma_{K,T}\approx \frac1T\int_0^T
+\sigma_{\mathrm{loc}}\!\left(t,F_t e^{(t/T)x_K}\right)\,dt,
+\]
+qui est une moyenne uniforme de la local vol le long de la droite log-linéaire joignant \(S_0\) à \(K\). C'est une intuition utile, mais trop grossière pour des applications numériques de marché.
+
+---
+
+## 13) Pourquoi Bergomi insiste-t-il sur le fait que cette approximation n'est pas suffisante pour le trading ?
+
+**Réponse.**  
+Parce que, pour des smiles actions réalistes, l'ordre 1 en \(\delta\sigma\) n'est pas assez précis pour les niveaux absolus de volatilité implicite. Les écarts de marché sont petits, donc il faut mieux capturer la dépendance de la densité elle-même à \(\sigma_{\mathrm{loc}}\), ce que l'ordre 1 ne fait pas.
+
+---
+
+## 14) Quel est le développement local de la volatilité locale près du forward ?
+
+**Réponse.**  
+On écrit
+\[
+\sigma_{\mathrm{loc}}(t,S)
+=
+\bar\sigma(t)+\alpha(t)x+\frac{\beta(t)}{2}x^2,
+\qquad
+x=\ln\!\left(\frac{S}{F_t}\right).
+\]
+Ici \(\alpha(t)\) représente le skew local instantané et \(\beta(t)\) la courbure locale instantanée.
+
+---
+
+## 15) Quelle formule obtient-on pour le smile implicite près du forward ?
+
+**Réponse.**  
+À l'ordre 1 en \(\alpha,\beta\),
+\[
+\hat\sigma_{K,T}
+\approx
+\frac1T\int_0^T\bar\sigma(t)\,dt
++
+\left(\frac1T\int_0^T\frac{t}{T}\alpha(t)\,dt\right)x_K
++
+\frac12\left(\frac1T\int_0^T\left(\frac{t}{T}\right)^2\beta(t)\,dt\right)x_K^2
+\]
+à une correction additive en niveau liée à \(\beta\) près. L'essentiel pour le smile est dans les coefficients de \(x_K\) et \(x_K^2\).
+
+---
+
+## 16) Quelle est la formule du skew implicite ATMF ?
+
+**Réponse.**  
+Au forward \(K=F_T\),
+\[
+\left.\frac{\partial\hat\sigma_{K,T}}{\partial\ln K}\right|_{K=F_T}
+=
+\frac1T\int_0^T\frac{t}{T}\alpha(t)\,dt.
+\]
+Le skew implicite est donc une moyenne pondérée du skew local.
+
+---
+
+## 17) Pourquoi le poids est-il \(t/T\) ?
+
+**Réponse.**  
+Parce qu'une variation de strike terminal n'affecte pas de la même façon toute la trajectoire. Au début, la contrainte terminale est peu visible ; près de la maturité, elle devient prépondérante. Le facteur \(t/T\) exprime exactement cette importance croissante.
+
+---
+
+## 18) Quelle est la formule de la courbure implicite ATMF ?
+
+**Réponse.**  
+On obtient
+\[
+\left.\frac{\partial^2\hat\sigma_{K,T}}{\partial(\ln K)^2}\right|_{K=F_T}
+=
+\frac1T\int_0^T\left(\frac{t}{T}\right)^2\beta(t)\,dt.
+\]
+Le poids accentue encore davantage les temps proches de \(T\).
+
+---
+
+## 19) Si \(\alpha(t)=\alpha\) est constant, que vaut le skew implicite ATMF ?
+
+**Réponse.**  
+Alors
+\[
+\left.\frac{\partial\hat\sigma_{K,T}}{\partial\ln K}\right|_{K=F_T}
+=
+\frac1T\int_0^T\frac{t}{T}\alpha\,dt
+=
+\frac{\alpha}{2}.
+\]
+Le skew implicite vaut donc la moitié du skew local.
+
+---
+
+## 20) Si \(\beta(t)=\beta\) est constant, que vaut la courbure implicite ATMF ?
+
+**Réponse.**  
+Alors
+\[
+\left.\frac{\partial^2\hat\sigma_{K,T}}{\partial(\ln K)^2}\right|_{K=F_T}
+=
+\frac1T\int_0^T\left(\frac{t}{T}\right)^2\beta\,dt
+=
+\frac{\beta}{3}.
+\]
+La courbure implicite vaut un tiers de la courbure locale.
+
+---
+
+## 21) Comment la surface implicite réagit-elle à un mouvement du spot, à strike fixe ?
+
+**Réponse.**  
+Au voisinage de l'ATMF,
+\[
+\left.
+\frac{\partial\hat\sigma_{K,T}}{\partial\ln S_0}
+\right|_{K=F_T}
+=
+\frac1T\int_0^T\left(1-\frac{t}{T}\right)\alpha(t)\,dt.
+\]
+Le poids est ici décroissant, car un mouvement de spot influence surtout le début de la trajectoire.
+
+---
+
+## 22) Quelle différence conceptuelle entre dérivée en strike et dérivée en spot ?
+
+**Réponse.**  
+La dérivée en strike mesure la pente instantanée du smile à date fixée :
+\[
+\partial_{\ln K}\hat\sigma.
+\]
+La dérivée en spot mesure le déplacement de la surface quand le spot bouge à strike absolu fixé :
+\[
+\partial_{\ln S_0}\hat\sigma.
+\]
+Elles correspondent à deux perturbations différentes et portent donc des poids temporels différents.
+
+---
+
+## 23) Comment obtient-on la dynamique de la volatilité ATMF ?
+
+**Réponse.**  
+Comme le strike ATMF dépend lui-même du spot,
+\[
+K=F_T(S_0),
+\]
+on applique la règle de chaîne :
+\[
+\frac{d\hat\sigma_{F_T,T}}{d\ln S_0}
+=
+\left.\frac{\partial\hat\sigma_{K,T}}{\partial\ln S_0}\right|_{K=F_T}
++
+\left.\frac{\partial\hat\sigma_{K,T}}{\partial\ln K}\right|_{K=F_T}.
+\]
+On trouve alors
+\[
+\frac{d\hat\sigma_{F_T,T}}{d\ln S_0}
+=
+\frac1T\int_0^T\alpha(t)\,dt.
+\]
+
+---
+
+## 24) Pourquoi cette formule ATMF est-elle importante ?
+
+**Réponse.**  
+Parce qu'elle montre que le mouvement de la vol ATMF n'est pas libre dans un modèle de volatilité locale : il est entièrement déterminé par la structure par terme de \(\alpha(t)\). C'est une contrainte forte du modèle.
+
+---
+
+## 25) Comment définit-on \(R_T\) ?
+
+**Réponse.**  
+Le ratio \(R_T\), appelé parfois skew stickiness ratio ou ratio de rigidité du skew, est
+\[
+R_T
+:=
+\frac{
+\dfrac{d\hat\sigma_{F_T,T}}{d\ln S_0}
+}{
+\left.\dfrac{\partial\hat\sigma_{K,T}}{\partial\ln K}\right|_{K=F_T}
+}
+=
+\frac{\int_0^T\alpha(t)\,dt}
+{\int_0^T \frac{t}{T}\alpha(t)\,dt}.
+\]
+Il compare le mouvement de la vol ATMF au skew ATMF.
+
+---
+
+## 26) Quelle est l'interprétation économique de \(R_T\) ?
+
+**Réponse.**  
+\(R_T\) mesure à quel point le smile "suit" le spot. Un \(R_T\) élevé signifie qu'un mouvement de spot provoque une forte variation de la vol ATMF relativement au skew. Le smile est alors rigide en strike absolu et peu transporté en delta.
+
+---
+
+## 27) Que valent les régimes sticky-strike et sticky-delta ?
+
+**Réponse.**  
+- **Sticky-strike** : les volatilités à strike fixe ne bougent pas lorsque le spot bouge. Alors la vol ATMF se déplace avec la pente du smile, et on a \(R_T=1\).
+- **Sticky-delta** : les volatilités à moneyness fixé ne bougent pas. Alors la vol ATMF reste inchangée lorsque le spot bouge, donc \(R_T=0\).
+
+---
+
+## 28) Pourquoi dit-on que le local vol donne souvent \(R_T=2\) à court terme ?
+
+**Réponse.**  
+Si \(\alpha(t)\) est à peu près constante au voisinage de 0, alors
+\[
+\frac{d\hat\sigma_{F_T,T}}{d\ln S_0}\approx \alpha,
+\qquad
+\left.\frac{\partial\hat\sigma_{K,T}}{\partial\ln K}\right|_{K=F_T}\approx \frac{\alpha}{2},
+\]
+d'où
+\[
+R_T\approx 2.
+\]
+C'est la fameuse "règle du \(R=2\)".
+
+---
+
+## 29) D'où vient la formule de décroissance en loi de puissance du skew ?
+
+**Réponse.**  
+Si
+\[
+\alpha(t)\sim \alpha_0\left(\frac{\tau_0}{t}\right)^\gamma,
+\]
+alors
+\[
+S_T=
+\left.\frac{\partial\hat\sigma_{K,T}}{\partial\ln K}\right|_{K=F_T}
+\sim
+\frac{1}{2-\gamma}\alpha_0\left(\frac{\tau_0}{T}\right)^\gamma.
+\]
+On intègre simplement la fonction \(t\mapsto (t/T)\alpha(t)\) sur \([0,T]\). L'exposant de décroissance du skew implicite est le même que celui du skew local.
+
+---
+
+## 30) Pourquoi faut-il introduire un cutoff \(\tau_0\) dans la loi de puissance ?
+
+**Réponse.**  
+Parce que si \(\alpha(t)\sim t^{-\gamma}\) jusqu'à \(t=0\), la fonction peut diverger au voisinage de 0. Bergomi impose donc une régularisation :
+\[
+\alpha(t)=\alpha_0 \quad \text{pour } t\le \tau_0.
+\]
+Cela rend les intégrales bien définies et plus réalistes économiquement.
+
+---
+
+## 31) Quel est le résultat exact de courte maturité ?
+
+**Réponse.**  
+Quand \(T\to 0\),
+\[
+\frac{1}{\hat\sigma(0,K)}
+=
+\frac{1}{\ln(K/S_0)}
+\int_{S_0}^{K}\frac{dS}{S\,\sigma_{\mathrm{loc}}(0,S)}.
+\]
+Autrement dit, l'inverse de la volatilité implicite est la moyenne harmonique de l'inverse de la local vol entre \(S_0\) et \(K\) en variable logarithmique.
+
+---
+
+## 32) Pourquoi ce résultat de courte maturité est-il surprenant ?
+
+**Réponse.**  
+Parce qu'on pourrait s'attendre à une moyenne de \(\sigma\) ou de \(\sigma^2\). En réalité, comme il n'y a plus de moyenne temporelle lorsque \(T\to0\), la bonne structure est spatiale et donne naturellement une moyenne harmonique de \(1/\sigma\).
+
+---
+
+## 33) Quelle est l'intuition financière derrière la moyenne harmonique ?
+
+**Réponse.**  
+Si la volatilité locale s'annule sur une région séparant \(S_0\) de \(K\), alors à très courte maturité le spot ne peut pratiquement pas traverser cette région. L'implicite doit donc aussi tendre vers 0. Une moyenne harmonique possède précisément cette propriété.
+
+---
+
+## 34) Peut-on dire que le local vol reproduit correctement la dynamique du smile observée sur actions ?
+
+**Réponse.**  
+En général, non. Même s'il calibre exactement la surface vanille statique, le modèle de local vol génère souvent des dynamiques trop rigides : le smile bouge trop en fonction du spot par rapport à ce qu'on observe. Les modèles de volatilité stochastique reproduisent souvent mieux les régimes proches du sticky-delta.
+
+---
+
+## 35) Pourquoi les modèles de volatilité stochastique sont-ils plus souples ?
+
+**Réponse.**  
+Parce qu'ils introduisent des facteurs aléatoires supplémentaires pour la variance future. Ainsi, à spot donné, la distribution conditionnelle future peut encore varier via ces facteurs, ce qui assouplit la dynamique de la surface implicite.
+
+---
+
+## 36) En quoi le local vol reste-t-il malgré tout utile ?
+
+**Réponse.**  
+Il reste très utile comme :
+- modèle de calibration statique exact aux vanilles,
+- outil d'analyse des liens entre smile et dynamique,
+- référence théorique pour comprendre quels mouvements de smile sont imposés mécaniquement par une structure donnée de volatilité locale.
+
+---
+
+## 37) Quelle est la principale limite de l'approximation d'ordre 1 ?
+
+**Réponse.**  
+Elle néglige l'effet de la dépendance de la densité au choix de \(\sigma_{\mathrm{loc}}\). Or, pour les smiles réalistes, cet effet est quantitativement important. L'approximation est bonne pour comprendre les dérivées du smile, moins pour obtenir des niveaux absolus fiables.
+
+---
+
+## 38) Pourquoi les résultats sur le skew sont-ils plus robustes que ceux sur le niveau ?
+
+**Réponse.**  
+Parce qu'un skew est une dérivée ou une différence de volatilités. Les erreurs systématiques communes aux niveaux se compensent partiellement lorsqu'on dérive ou qu'on compare des points voisins de la surface.
+
+---
+
+## 39) Que faut-il retenir comme message central pour un oral ?
+
+**Réponse.**  
+Le message central est :  
+**dans un modèle de volatilité locale, la surface implicite future est entièrement contrainte par la géométrie spatio-temporelle de \(\sigma_{\mathrm{loc}}(t,S)\), et en particulier le comportement du skew est gouverné par la structure par terme de \(\alpha(t)\).**
+
+---
+
+## 40) Quelle phrase de conclusion peut-on donner sur 2.4.6 ?
+
+**Réponse.**  
+Le résultat de courte maturité montre qu'à l'échelle infinitésimale, le lien entre local vol et implicite n'est plus une moyenne temporelle de variances, mais une moyenne spatiale harmonique des inverses de volatilité. Cela illustre la différence profonde entre asymptotique en temps et approximation perturbative.

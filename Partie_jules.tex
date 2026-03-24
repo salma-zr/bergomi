@@ -1,0 +1,281 @@
+\begin{frame}{Du local vol vers l'implicite : la question}
+\small
+\begin{itemize}
+    \item Sous volatilite locale :
+    \[
+    dS_t=(r-q)S_t\,dt+\sigma_{\mathrm{loc}}(t,S_t)S_t\,dW_t.
+    \]
+    \item Dupire donne \(\sigma_{\mathrm{loc}}\) a partir de la surface implicite.
+    \item Ici, on veut faire le chemin inverse :
+    \[
+    \sigma_{\mathrm{loc}}(t,S)\quad \Longrightarrow \quad \hat{\sigma}(K,T).
+    \]
+    \item Idee cle :
+    \begin{itemize}
+        \item identite exacte sur \(\hat{\sigma}^2\),
+        \item formule exploitable a l'ordre 1 quand la local vol est \emph{faiblement locale}.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Identite exacte : moyenne ponderee de variance locale}
+\small
+\[
+\hat{\sigma}_{K,T}^{\,2}
+=
+\frac{
+\mathbb{E}^{\mathrm{loc}}\!\left[
+\int_0^T e^{-rt} S_t^2 \Gamma_t^{BS}(\hat{\sigma}_{K,T})
+\sigma_{\mathrm{loc}}^2(t,S_t)\,dt
+\right]
+}{
+\mathbb{E}^{\mathrm{loc}}\!\left[
+\int_0^T e^{-rt} S_t^2 \Gamma_t^{BS}(\hat{\sigma}_{K,T})\,dt
+\right]
+}
+\]
+
+\vspace{0.2cm}
+\begin{itemize}
+    \item \(\Gamma_t^{BS}(\hat{\sigma}_{K,T})\) : gamma Black--Scholes de l'option consideree.
+    \item Les poids sont des \emph{dollar gammas} actualises le long des trajectoires.
+    \item \textbf{Attention :} l'identite exacte porte sur \(\hat{\sigma}^2\), donc sur la \textbf{variance locale}, pas encore directement sur \(\hat{\sigma}\).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Approximation faible local vol}
+\small
+Si \(\sigma_{\mathrm{loc}}(t,S)=\sigma_0+\delta \sigma(t,S)\) avec \(\delta \sigma\) petit, alors
+\[
+\hat{\sigma}_{K,T}
+\approx
+\frac{1}{T}
+\int_0^T\!\!dt
+\int_{\mathbb{R}}\phi(y)\,
+\sigma_{\mathrm{loc}}\!\left(
+t,\,
+F_t\exp\!\Big(
+\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
+\Big)
+\right)dy
+\]
+avec
+\[
+x_K=\ln\!\left(\frac{K}{F_T}\right),\qquad
+\phi(y)=\frac{e^{-y^2/2}}{\sqrt{2\pi}}.
+\]
+
+\begin{itemize}
+    \item Lecture : \(\hat{\sigma}\) est une moyenne gaussienne de la local vol le long de ponts lognormaux.
+    \item Si on ne garde que \(y=0\), on moyenne la local vol le long du chemin le plus probable entre \(S_0\) et \(K\).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Smile pres du forward : parametrisation locale}
+\small
+On developpe la local vol autour du forward \(F_t\) :
+\[
+\sigma_{\mathrm{loc}}(t,S)=\bar{\sigma}(t)+\alpha(t)x+\frac{\beta(t)}{2}x^2,
+\qquad
+x=\ln\!\left(\frac{S}{F_t}\right).
+\]
+
+\begin{itemize}
+    \item \(\alpha(t)\) mesure le \textbf{skew local instantane}.
+    \item \(\beta(t)\) mesure la \textbf{courbure locale instantanee}.
+    \item En reinjectant cette expansion dans la formule faible-local-vol, on obtient le smile implicite au voisinage du forward.
+\end{itemize}
+
+\[
+X(t,y)=\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
+\]
+\end{frame}
+
+\begin{frame}{Skew et courbure implicites : moyennes ponderees}
+\small
+\[
+\hat{\sigma}_{K,T}
+\approx
+\frac{1}{T}\int_0^T \bar{\sigma}(t)\,dt
+\;+\;
+\left(
+\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt
+\right)x_K
+\;+\;
+\frac{1}{2}
+\left(
+\frac{1}{T}\int_0^T \Big(\frac{t}{T}\Big)^2\beta(t)\,dt
+\right)x_K^2
+\]
+
+\[
+\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt
+\]
+\[
+\left.\frac{\partial^2 \hat{\sigma}_{K,T}}{\partial (\ln K)^2}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \Big(\frac{t}{T}\Big)^2\beta(t)\,dt
+\]
+
+\begin{itemize}
+    \item Le skew implicite est une \textbf{moyenne ponderee} du skew local \(\alpha(t)\).
+    \item Le poids \(t/T\) donne plus d'importance aux temps proches de la maturite.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Pourquoi le poids \texorpdfstring{$t/T$}{t/T} ?}
+\small
+\[
+X(t,y)=\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
+\]
+
+\begin{itemize}
+    \item A \(t=0\), le strike final n'a encore \textbf{aucun effet} : poids nul.
+    \item A \(t=T\), le strike final est \textbf{entierement impose} : poids unitaire.
+    \item Donc le skew implicite ne "voit" pas \(\alpha(t)\) uniformement dans le temps.
+\end{itemize}
+
+\vspace{0.2cm}
+\[
+\alpha(t)\ \text{constant}
+\quad \Longrightarrow \quad
+\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+=\frac{\alpha}{2}.
+\]
+
+\begin{block}{Message}
+La local vol peut avoir un skew instantane \(\alpha\), mais le smile implicite ATMF n'en retient qu'environ la moitie si ce skew est constant dans le temps.
+\end{block}
+\end{frame}
+
+\begin{frame}{Mouvement du smile quand le spot bouge}
+\small
+Pour un \textbf{strike fixe} \(K\), on derive la formule precedente par rapport a \(\ln S_0\) :
+\[
+\left.
+\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln S_0}
+\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T
+\left(1-\frac{t}{T}\right)\alpha(t)\,dt.
+\]
+
+\begin{itemize}
+    \item Ici le poids est \(1-t/T\), donc \textbf{les temps courts dominent}.
+    \item Intuition : un choc de spot agit surtout au debut de la trajectoire, avant que la contrainte terminale \(K\) ne prenne le dessus.
+\end{itemize}
+
+\[
+\frac{t}{T}
+\quad \text{pour le skew strike}
+\qquad\text{vs}\qquad
+1-\frac{t}{T}
+\quad \text{pour le spot a strike fixe.}
+\]
+\end{frame}
+
+\begin{frame}{Dynamique ATMF et role central de \texorpdfstring{$\alpha(t)$}{alpha(t)}}
+\small
+Comme \(K=F_T(S_0)\) pour l'ATMF,
+\[
+\frac{d\hat{\sigma}_{F_T,T}}{d\ln S_0}
+=
+\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln S_0}\right|_{K=F_T}
+\;+\;
+\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \alpha(t)\,dt.
+\]
+
+\begin{itemize}
+    \item Cette fois, \textbf{toutes les dates comptent avec le meme poids}.
+    \item La dynamique de la vol ATMF est entierement determinee par la structure par terme du skew local \(\alpha(t)\).
+\end{itemize}
+
+\begin{block}{Point cle}
+Le mouvement de la vol ATMF sous local vol n'est pas libre : il est impose par la courbe \(t\mapsto \alpha(t)\).
+\end{block}
+\end{frame}
+
+\begin{frame}{Le ratio \texorpdfstring{$R_T$}{R_T} : rigidite du skew}
+\small
+\[
+R_T
+:=
+\frac{
+\dfrac{d\hat{\sigma}_{F_T,T}}{d\ln S_0}
+}{
+\left.\dfrac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+}
+=
+\frac{\int_0^T \alpha(t)\,dt}{\int_0^T \frac{t}{T}\alpha(t)\,dt}.
+\]
+
+\begin{itemize}
+    \item \textbf{Sticky-delta :} \(R_T=0\) (la vol ATMF ne bouge pas quand le spot bouge).
+    \item \textbf{Sticky-strike :} \(R_T=1\) (les vols a strike fixe restent invariantes).
+    \item \textbf{Local vol, skew local constant :} \(R_T=2\).
+\end{itemize}
+
+\begin{block}{Interpretation}
+Sous local vol, le smile est en general \textbf{trop rigide} : l'ATMF reagit plus qu'en sticky-strike et beaucoup plus qu'en sticky-delta.
+\end{block}
+\end{frame}
+
+\begin{frame}{Structure par terme du skew : loi de puissance}
+\small
+Si
+\[
+\alpha(t)=\alpha_0\left(\frac{\tau_0}{t}\right)^\gamma
+\quad (t>\tau_0),
+\qquad
+\alpha(t)=\alpha_0
+\quad (t\le \tau_0),
+\]
+alors, pour \(T\) grand devant \(\tau_0\),
+\[
+\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+\sim
+\frac{1}{2-\gamma}\,
+\alpha_0\left(\frac{\tau_0}{T}\right)^\gamma.
+\]
+
+\begin{itemize}
+    \item Le skew implicite ATMF decroit avec \textbf{le meme exposant} \(\gamma\) que le skew local.
+    \item \(\alpha(t)\) controle donc directement la pente du smile et sa structure par terme.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Maturites courtes : resultat exact}
+\small
+Quand \(T\to 0\), on a un resultat exact :
+\[
+\frac{1}{\hat{\sigma}(0,K)}
+=
+\frac{1}{\ln(K/S_0)}
+\int_{S_0}^{K}\frac{dS}{S\,\sigma_{\mathrm{loc}}(0,S)}.
+\]
+
+\begin{itemize}
+    \item Ce n'est \textbf{pas} une moyenne arithmetique de \(\sigma_{\mathrm{loc}}\),
+    \item c'est une \textbf{moyenne harmonique} de \(1/\sigma_{\mathrm{loc}}\) entre \(S_0\) et \(K\).
+    \item Intuition : a tres courte maturite, il n'y a presque plus de moyenne temporelle ; la geometrie spatiale domine.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{A retenir : Dupire, stoch vol, limites}
+\small
+\begin{itemize}
+    \item \textbf{Lien avec Dupire :} Dupire donne \(\sigma_{\mathrm{loc}}\) a partir du smile ; ici on etudie le \emph{retour} de \(\sigma_{\mathrm{loc}}\) vers \(\hat{\sigma}\).
+    \item \textbf{Forces :} les formules d'ordre 1 expliquent bien skew, courbure, dynamique ATMF, et le role de \(\alpha(t)\).
+    \item \textbf{Limite majeure :} pour les smiles equity realistes, l'approximation faible-local-vol est insuffisante pour les niveaux absolus.
+    \item \textbf{Par rapport a la stoch vol :} la dynamique du smile est trop contrainte sous local vol ; en pratique, les modeles stochastiques donnent souvent des mouvements plus proches de sticky-delta.
+\end{itemize}
+
+\vspace{0.2cm}
+\begin{block}{Conclusion}
+Le message central de Bergomi est que, sous local vol, la dynamique de l'implicite est entierement codee par la structure spatiale et temporelle de \(\sigma_{\mathrm{loc}}(t,S)\), surtout via \(\alpha(t)\).
+\end{block}
+\end{frame}
