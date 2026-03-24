@@ -1,0 +1,1583 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[a4paper,margin=2.3cm]{geometry}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\setlist[itemize]{topsep=0.25em,itemsep=0.2em}
+\setlist[enumerate]{topsep=0.25em,itemsep=0.2em}
+
+\title{Rapport detaille -- Bergomi 2.4 a 2.4.6}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+\section{Bergomi, Chapitre 2.4 -- Des volatilites locales aux volatilites implicites}
+
+\section{Objectif du chapitre}
+
+Le chapitre 2.4 de Bergomi repond a la question inverse de Dupire :
+
+\begin{itemize}
+\item \textbf{Dupire} : a partir de la surface implicite \(\widehat{\sigma}(K,T)\), retrouver la volatilite locale \(\sigma_{\mathrm{loc}}(t,S)\).
+\item \textbf{Ici} : en supposant donnee la fonction de volatilite locale \(\sigma_{\mathrm{loc}}(t,S)\), comprendre \textbf{quelle surface implicite elle engendre} et surtout \textbf{quelle dynamique du smile} elle impose.
+\end{itemize}
+
+Le message central est le suivant :
+
+\begin{enumerate}
+\item il existe une \textbf{identite exacte} exprimant la \textbf{variance implicite} comme une moyenne ponderee de la \textbf{variance locale} ;
+\item si la volatilite locale est \textbf{faiblement locale} (petite dependance en \(S\)), on obtient une formule exploitable pour la \textbf{volatilite implicite elle-meme} ;
+\item pres du forward, le \textbf{skew implicite} et la \textbf{dynamique de la vol ATMF} sont entierement gouvernes par la structure par terme du \textbf{skew local} \(\alpha(t)\) ;
+\item a tres courte maturite, il existe un \textbf{resultat exact} : l'inverse de la volatilite implicite est une \textbf{moyenne harmonique} de l'inverse de la volatilite locale.
+\end{enumerate}
+
+\bigskip\hrule\bigskip
+
+\section{1. Cadre, notations et hypotheses}
+
+On travaille sous la mesure risque-neutre avec :
+
+\[
+dS_t=(r-q)S_t\,dt+\sigma_{\mathrm{loc}}(t,S_t)S_t\,dW_t.
+\]
+
+On note :
+
+\begin{itemize}
+\item \(S_0\) : spot initial ;
+\item \(F_t=S_0 e^{(r-q)t}\) : forward a maturite \(t\) ;
+\item \(K\) : strike ;
+\item \(T\) : maturite ;
+\item \(x_K=\ln(K/F_T)\) : log-moneyness forward ;
+\item \(\widehat{\sigma}_{K,T}\) : volatilite implicite Black-Scholes de l'option europeenne \((K,T)\).
+\end{itemize}
+
+On distinguera soigneusement :
+
+\begin{itemize}
+\item \textbf{volatilite locale} : \(\sigma_{\mathrm{loc}}(t,S)\), objet du modele ;
+\item \textbf{volatilite implicite} : \(\widehat{\sigma}_{K,T}\), objet observe sur le marche.
+\end{itemize}
+
+Dans tout le chapitre, on cherche a comprendre comment \(\widehat{\sigma}_{K,T}\) depend de \(\sigma_{\mathrm{loc}}(t,S)\).
+
+\bigskip\hrule\bigskip
+
+\section{2. Section 2.4.1 -- Identite exacte : la variance implicite comme moyenne ponderee}
+
+\subsection{2.1. Idee de couverture gamma/theta}
+
+Considerons :
+
+\begin{itemize}
+\item un \textbf{modele I} de reference, avec prix \(P_1(t,S)\), et volatilite instantanee \(\sigma_1(t,S)\) ;
+\item un \textbf{modele II} "reel", sous lequel l'actif suit
+\end{itemize}
+
+\[
+dS_t=(r-q)S_t\,dt+\sigma_{2,t}S_t\,dW_t.
+\]
+
+Ici \(\sigma_{2,t}\) peut etre un processus arbitraire.
+
+On considere une option europeenne de payoff \(f(S_T)\), maturity \(T\), et on regarde la quantite actualisee :
+
+\[
+Q_t=e^{-rt}P_1(t,S_t).
+\]
+
+\subsection{2.2. Application de la formule d'Itô}
+
+Sous le modele II, par Itô :
+
+\[
+dQ_t
+=
+e^{-rt}
+\left[
+\left(-rP_1+\partial_t P_1\right)dt
++
+\partial_S P_1\,dS_t
++
+\frac12 \partial_{SS}P_1\, d\langle S\rangle_t
+\right].
+\]
+
+Or
+
+\[
+d\langle S\rangle_t=\sigma_{2,t}^2 S_t^2\,dt.
+\]
+
+Donc
+
+\[
+dQ_t
+=
+e^{-rt}
+\left[
+\left(-rP_1+\partial_t P_1\right)dt
++
+\partial_S P_1\,dS_t
++
+\frac12 \sigma_{2,t}^2 S_t^2 \partial_{SS}P_1\,dt
+\right].
+\]
+
+Prenons maintenant l'esperance conditionnelle. Le terme en \(dW_t\) disparait et il reste :
+
+\[
+\mathbb{E}_2[dQ_t\mid \mathcal{F}_t]
+=
+e^{-rt}
+\left[
+-rP_1+\partial_t P_1
++(r-q)S_t\partial_S P_1
++\frac12 \sigma_{2,t}^2 S_t^2 \partial_{SS}P_1
+\right]dt.
+\]
+
+\subsection{2.3. Utilisation de l'EDP du modele de reference}
+
+Le prix \(P_1\) satisfait dans le modele I :
+
+\[
+\partial_t P_1+(r-q)S\partial_S P_1+\frac12 \sigma_1^2(t,S)S^2\partial_{SS}P_1-rP_1=0.
+\]
+
+En remplacant dans la formule precedente :
+
+\[
+\mathbb{E}_2[dQ_t\mid \mathcal{F}_t]
+=
+e^{-rt}\frac12 S_t^2\partial_{SS}P_1(t,S_t)\left(\sigma_{2,t}^2-\sigma_1^2(t,S_t)\right)dt.
+\]
+
+En integrant entre \(0\) et \(T\), puis en prenant l'esperance :
+
+\[
+\mathbb{E}_2[Q_T]
+=
+Q_0
++
+\mathbb{E}_2\left[
+\int_0^T e^{-rt}\frac12 S_t^2\partial_{SS}P_1(t,S_t)
+\left(\sigma_{2,t}^2-\sigma_1^2(t,S_t)\right)dt
+\right].
+\]
+
+Comme \(Q_T=e^{-rT}f(S_T)\), on obtient :
+
+\[
+P_2(0,S_0,\cdot)
+=
+P_1(0,S_0)
++
+\mathbb{E}_2\left[
+\int_0^T e^{-rt}\frac12 S_t^2\partial_{SS}P_1(t,S_t)
+\left(\sigma_{2,t}^2-\sigma_1^2(t,S_t)\right)dt
+\right].
+\]
+
+C'est la formule fondamentale de Bergomi : \textbf{le prix sous un modele II est egal au prix sous le modele I plus le P\\&L moyen gamma/theta d'une couverture delta faite avec le modele I}.
+
+\subsection{2.4. Cas particulier : le modele I est Black-Scholes}
+
+On choisit maintenant comme modele I le modele Black-Scholes de volatilite \textbf{constante} egale a la volatilite implicite de l'option consideree :
+
+\[
+\sigma_1(t,S)\equiv \widehat{\sigma}_{K,T}.
+\]
+
+Par definition de la volatilite implicite :
+
+\[
+P_1(0,S_0)=P_2(0,S_0,\cdot).
+\]
+
+La formule precedente donne alors :
+
+\[
+0
+=
+\mathbb{E}_2\left[
+\int_0^T e^{-rt}\frac12 S_t^2\Gamma_t^{BS}(\widehat{\sigma}_{K,T})
+\left(\sigma_{2,t}^2-\widehat{\sigma}_{K,T}^2\right)dt
+\right].
+\]
+
+En reordonnant :
+
+\[
+\widehat{\sigma}_{K,T}^{\,2}
+=
+\frac{
+\mathbb{E}_2\left[
+\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}(\widehat{\sigma}_{K,T})\,\sigma_{2,t}^2\,dt
+\right]
+}{
+\mathbb{E}_2\left[
+\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}(\widehat{\sigma}_{K,T})\,dt
+\right]
+}.
+\]
+
+\subsection{2.5. Cas du modele de volatilite locale}
+
+Si le modele II est justement le modele local vol :
+
+\[
+\sigma_{2,t}=\sigma_{\mathrm{loc}}(t,S_t),
+\]
+
+alors
+
+\[
+\boxed{
+\widehat{\sigma}_{K,T}^{\,2}
+=
+\frac{
+\mathbb{E}^{\mathrm{loc}}\left[
+\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}(\widehat{\sigma}_{K,T})
+\sigma_{\mathrm{loc}}^2(t,S_t)\,dt
+\right]
+}{
+\mathbb{E}^{\mathrm{loc}}\left[
+\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}(\widehat{\sigma}_{K,T})\,dt
+\right]
+}.
+}
+\]
+
+\subsection{2.6. Interpretation precise}
+
+Cette identite dit que :
+
+\begin{itemize}
+\item la \textbf{variance implicite} n'est pas arbitraire ;
+\item elle est la \textbf{moyenne ponderee} de la \textbf{variance locale} ;
+\item les poids sont les \textbf{dollar gammas actualises} du prix Black-Scholes, le long des trajectoires du modele local vol.
+\end{itemize}
+
+\subsection{2.7. Warning conceptuel important}
+
+La formule exacte porte sur :
+
+\[
+\widehat{\sigma}_{K,T}^{\,2},
+\]
+
+et non directement sur \(\widehat{\sigma}_{K,T}\).
+
+Autrement dit :
+
+\begin{itemize}
+\item \textbf{exactement} : c'est une moyenne de \textbf{variances locales} ;
+\item \textbf{approximativement, a l'ordre 1} : on obtiendra une moyenne de \textbf{volatilites locales}.
+\end{itemize}
+
+Cette distinction est mathematiquement essentielle.
+
+\bigskip\hrule\bigskip
+
+\section{3. Section 2.4.2 -- Approximation pour une local vol faiblement locale}
+
+L'identite exacte precedente est implicite, car le membre de droite depend lui-meme de \(\widehat{\sigma}_{K,T}\).
+
+Bergomi introduit alors une approximation de type perturbatif.
+
+\subsection{3.1. Decomposition de la variance locale}
+
+On pose :
+
+\[
+u(t,S)=\sigma_{\mathrm{loc}}^2(t,S)=u_0(t)+\delta u(t,S),
+\]
+
+ou :
+
+\begin{itemize}
+\item \(u_0(t)=\sigma_0^2(t)\) est une variance \textbf{deterministe en temps} ;
+\item \(\delta u(t,S)\) est une petite perturbation.
+\end{itemize}
+
+Si \(\delta u=0\), alors l'implicite correspondante est simplement la volatilite moyenne quadratique :
+
+\[
+\widehat{\sigma}_{0;t_1,t_2}^{\,2}
+=
+\frac{1}{t_2-t_1}\int_{t_1}^{t_2}\sigma_0^2(t)\,dt.
+\]
+
+En particulier,
+
+\[
+\widehat{\sigma}_{0;0,T}^{\,2}
+=
+\frac{1}{T}\int_0^T \sigma_0^2(t)\,dt.
+\]
+
+\subsection{3.2. Pourquoi la perturbation de la densite disparait a l'ordre 1}
+
+Dans la formule exacte, \(\delta u\) intervient :
+
+\begin{enumerate}
+\item explicitement dans le numerateur ;
+\item implicitement, car la loi de \(S_t\) depend elle aussi de \(u\).
+\end{enumerate}
+
+Notons schematiquement :
+
+\[
+\frac{\mathbb{E}_{u_0+\delta u}[(u_0+\delta u)\bullet]}
+{\mathbb{E}_{u_0+\delta u}[\bullet]}.
+\]
+
+Au premier ordre :
+
+\[
+\frac{A_0+\delta A}{B_0+\delta B}
+=
+\frac{A_0}{B_0}
++
+\frac{\delta A\,B_0-A_0\,\delta B}{B_0^2}
++
+O(\delta^2).
+\]
+
+Mais au point de base, on a \(A_0=u_0 B_0\). Donc :
+
+\[
+\frac{\delta A\,B_0-A_0\,\delta B}{B_0^2}
+=
+\frac{\delta A-u_0\delta B}{B_0}.
+\]
+
+Or la partie de \(\delta A\) due a la perturbation de la loi est exactement \(u_0\delta B\), donc elle s'annule. Il reste seulement la contribution \textbf{explicite} de \(\delta u\).
+
+Conclusion :
+
+\[
+\delta\!\left(\widehat{\sigma}_{K,T}^{\,2}\right)
+=
+\frac{
+\mathbb{E}_{\sigma_0}\left[
+\int_0^T e^{-rt}\delta u(t,S_t)S_t^2\Gamma_t^{(0)}\,dt
+\right]
+}{
+\mathbb{E}_{\sigma_0}\left[
+\int_0^T e^{-rt}S_t^2\Gamma_t^{(0)}\,dt
+\right]
+},
+\]
+
+ou \(\Gamma_t^{(0)}\) est la gamma dans le modele Black-Scholes de variance deterministe \(u_0(t)\).
+
+\subsection{3.3. Calcul explicite du denominateur}
+
+Sous Black-Scholes a volatilite deterministe, on sait que
+
+\[
+e^{-rt}S_t^2\Gamma_t^{(0)}
+\]
+
+est une martingale. Donc
+
+\[
+\mathbb{E}_{\sigma_0}\left[e^{-rt}S_t^2\Gamma_t^{(0)}\right]
+=
+S_0^2\Gamma_0^{(0)}.
+\]
+
+Par integration en temps :
+
+\[
+\mathbb{E}_{\sigma_0}\left[
+\int_0^T e^{-rt}S_t^2\Gamma_t^{(0)}\,dt
+\right]
+=
+T S_0^2 \Gamma_0^{(0)}.
+\]
+
+\subsection{3.4. Calcul du numerateur}
+
+Posons
+
+\[
+\omega_t=\int_0^t \sigma_0^2(\tau)\,d\tau.
+\]
+
+Sous le modele de base, \(X_t=\ln(S_t/F_t)\) suit une loi normale :
+
+\[
+X_t\sim \mathcal{N}\!\left(-\frac{\omega_t}{2},\,\omega_t\right).
+\]
+
+En ecrivant le numerateur comme une integrale sur \(S\), puis en passant a la variable
+
+\[
+x=\ln(S/F_t),
+\]
+
+le produit :
+
+\begin{itemize}
+\item de la densite lognormale de \(S_t\),
+\item et de la gamma Black-Scholes de l'option \((K,T)\),
+\end{itemize}
+
+donne un produit de deux gaussiennes en \(x\). En regroupant les termes quadratiques, on obtient une nouvelle gaussienne de :
+
+\begin{itemize}
+\item moyenne
+\end{itemize}
+
+\[
+\mu_t=\frac{\omega_t}{\omega_T}x_K,
+\]
+
+\begin{itemize}
+\item variance
+\end{itemize}
+
+\[
+\nu_t=\frac{\omega_t(\omega_T-\omega_t)}{\omega_T}.
+\]
+
+Apres standardisation :
+
+\[
+x=\frac{\omega_t}{\omega_T}x_K+\sqrt{\frac{\omega_t(\omega_T-\omega_t)}{\omega_T}}\,y,
+\qquad y\sim \mathcal{N}(0,1),
+\]
+
+on obtient la formule de Bergomi :
+
+\[
+\boxed{
+\delta\!\left(\widehat{\sigma}_{K,T}^{\,2}\right)
+=
+\frac{1}{T}\int_0^T dt\int_{\mathbb{R}}\phi(y)\,
+\delta u\!\left(
+t,\,
+F_t\exp\!\left(
+\frac{\omega_t}{\omega_T}x_K+
+\sqrt{\frac{\omega_t(\omega_T-\omega_t)}{\omega_T}}\,y
+\right)
+\right)dy
+}
+\]
+
+avec
+
+\[
+\phi(y)=\frac{e^{-y^2/2}}{\sqrt{2\pi}}.
+\]
+
+Comme
+
+\[
+\widehat{\sigma}_{K,T}^{\,2}
+=
+\frac{1}{T}\int_0^T u_0(t)\,dt
++
+\delta\!\left(\widehat{\sigma}_{K,T}^{\,2}\right),
+\]
+
+on peut reecrire :
+
+\[
+\boxed{
+\widehat{\sigma}_{K,T}^{\,2}
+=
+\frac{1}{T}\int_0^T dt\int_{\mathbb{R}}\phi(y)\,
+u\!\left(
+t,\,
+F_t\exp\!\left(
+\frac{\omega_t}{\omega_T}x_K+
+\sqrt{\frac{\omega_t(\omega_T-\omega_t)}{\omega_T}}\,y
+\right)
+\right)dy.
+}
+\]
+
+\subsection{3.5. Interpretation geometrique}
+
+Cette formule dit que la variance implicite s'obtient en moyennant \(u(t,S)\) sur des points \(S\) de la forme
+
+\[
+S(t,y)=F_t\exp\!\left(
+\frac{\omega_t}{\omega_T}x_K+
+\sqrt{\frac{\omega_t(\omega_T-\omega_t)}{\omega_T}}\,y
+\right).
+\]
+
+Le terme
+
+\[
+\frac{\omega_t}{\omega_T}x_K
+\]
+
+interpole entre :
+
+\begin{itemize}
+\item \(0\) a la date \(0\) ;
+\item \(x_K\) a la date \(T\).
+\end{itemize}
+
+Le terme aleatoire
+
+\[
+\sqrt{\frac{\omega_t(\omega_T-\omega_t)}{\omega_T}}\,y
+\]
+
+est maximal a mi-parcours et nul aux extremites. Cela traduit le fait que les chemins sont "epingles" en :
+
+\begin{itemize}
+\item \(S_0\) au temps \(0\),
+\item \(K\) au temps \(T\).
+\end{itemize}
+
+\bigskip\hrule\bigskip
+
+\section{4. Section 2.4.3 -- Expansion autour d'une volatilite constante}
+
+Supposons maintenant :
+
+\[
+\sigma_{\mathrm{loc}}(t,S)=\sigma_0+\delta\sigma(t,S),
+\]
+
+avec \(\sigma_0\) constante et \(\delta\sigma\) petit.
+
+Alors :
+
+\[
+u(t,S)=\sigma_0^2+2\sigma_0\delta\sigma(t,S)+O(\delta\sigma^2),
+\]
+
+et
+
+\[
+\widehat{\sigma}_{K,T}^{\,2}
+=
+\sigma_0^2+2\sigma_0\,\delta\widehat{\sigma}_{K,T}+O(\delta\sigma^2).
+\]
+
+En remplaçant dans la formule precedente et en divisant par \(2\sigma_0\), on obtient :
+
+\[
+\delta\widehat{\sigma}_{K,T}
+=
+\frac{1}{T}\int_0^T dt
+\int_{\mathbb{R}}\phi(y)\,
+\delta\sigma\!\left(
+t,\,
+F_t\exp\!\left(
+\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
+\right)
+\right)dy.
+\]
+
+En ajoutant \(\sigma_0\) des deux cotes :
+
+\[
+\boxed{
+\widehat{\sigma}_{K,T}
+\approx
+\frac{1}{T}\int_0^T dt
+\int_{\mathbb{R}}\phi(y)\,
+\sigma_{\mathrm{loc}}\!\left(
+t,\,
+F_t\exp\!\left(
+\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
+\right)
+\right)dy.
+}
+\]
+
+\subsection{4.1. Pourquoi on parle de "moyenne ponderee de local vol"}
+
+Cette formule justifie l'heuristique suivante :
+
+\[
+\widehat{\sigma}_{K,T}
+\approx
+\text{moyenne gaussienne de } \sigma_{\mathrm{loc}}(t,S)
+\text{ le long de ponts lognormaux.}
+\]
+
+Encore une fois :
+
+\begin{itemize}
+\item \textbf{exact} : moyenne de \(\sigma_{\mathrm{loc}}^2\) ;
+\item \textbf{a l'ordre 1} : moyenne de \(\sigma_{\mathrm{loc}}\).
+\end{itemize}
+
+\subsection{4.2. Chemin le plus probable}
+
+Le poids gaussien maximal est obtenu pour \(y=0\). Le point dominant est donc :
+
+\[
+S^*(t)=F_t\exp\!\left(\frac{t}{T}x_K\right).
+\]
+
+En ne gardant que cette trajectoire, on obtient l'approximation dite du "most likely path" :
+
+\[
+\widehat{\sigma}_{K,T}
+\approx
+\frac{1}{T}\int_0^T \sigma_{\mathrm{loc}}\!\left(t,S^*(t)\right)\,dt.
+\]
+
+Geometriquement :
+
+\begin{itemize}
+\item \(\ln S^*(0)=\ln S_0\),
+\item \(\ln S^*(T)=\ln K\),
+\end{itemize}
+
+donc \(\ln S^*(t)\) est la droite reliant \(\ln S_0\) a \(\ln K\).
+
+\subsection{4.3. Warning de Bergomi}
+
+Cette approximation est \textbf{utile pour comprendre} le smile, mais \textbf{pas assez precise pour le trading} sur smiles equity realistes. La raison profonde est que l'effet de \(\sigma_{\mathrm{loc}}\) sur la \textbf{densite} de \(S_t\) est crucial et ne peut pas etre neglige pour obtenir des niveaux absolus precis.
+
+Autrement dit :
+
+\begin{itemize}
+\item pour l'intuition, l'ordre 1 est tres bon ;
+\item pour les prix de marche de precision, il faut resoudre l'equation forward de Dupire.
+\end{itemize}
+
+\bigskip\hrule\bigskip
+
+\section{5. Section 2.4.5 -- Smile pres du forward}
+
+\subsection{5.1. Parametrisation locale}
+
+On suppose la volatilite locale suffisamment reguliere et on developpe autour du forward \(F_t\) :
+
+\[
+\sigma_{\mathrm{loc}}(t,S)
+=
+\overline{\sigma}(t)+\alpha(t)x+\frac{\beta(t)}{2}x^2,
+\qquad
+x=\ln(S/F_t).
+\]
+
+Interpretation :
+
+\begin{itemize}
+\item \(\overline{\sigma}(t)\) : niveau instantane moyen de vol locale ;
+\item \(\alpha(t)\) : \textbf{skew local instantane} ;
+\item \(\beta(t)\) : \textbf{courbure locale instantanee}.
+\end{itemize}
+
+\subsection{5.2. Remplacement dans la formule weak-local-vol}
+
+Dans la formule precedente, l'argument de la local vol est
+
+\[
+X(t,y)=\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y.
+\]
+
+Donc :
+
+\[
+\sigma_{\mathrm{loc}}(t,S(t,y))
+=
+\overline{\sigma}(t)+\alpha(t)X(t,y)+\frac{\beta(t)}{2}X^2(t,y).
+\]
+
+En integrant en \(y\) :
+
+\[
+\mathbb{E}[X(t,y)]
+=
+\frac{t}{T}x_K,
+\]
+
+et
+
+\[
+\mathbb{E}[X^2(t,y)]
+=
+\left(\frac{t}{T}\right)^2 x_K^2
++
+\sigma_0^2\frac{(T-t)t}{T}.
+\]
+
+Par suite :
+
+\[
+\widehat{\sigma}_{K,T}
+\approx
+\frac{1}{T}\int_0^T \overline{\sigma}(t)\,dt
++
+\left(
+\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt
+\right)x_K
++
+\frac12
+\left(
+\frac{1}{T}\int_0^T \left(\frac{t}{T}\right)^2\beta(t)\,dt
+\right)x_K^2
+\]
+
+\[
+\qquad
++
+\frac{\sigma_0^2 T}{2}
+\left(
+\frac{1}{T}\int_0^T \frac{(T-t)t}{T^2}\beta(t)\,dt
+\right).
+\]
+
+Le dernier terme est une correction de niveau, independante de \(K\). Les termes importants pour la forme du smile sont ceux en \(x_K\) et \(x_K^2\).
+
+\subsection{5.3. Skew implicite ATMF}
+
+En derivant par rapport a \(\ln K\), puis en evaluant en \(K=F_T\) (soit \(x_K=0\)) :
+
+\[
+\boxed{
+\mathcal{S}_T
+:=
+\left.\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt.
+}
+\]
+
+Cette formule est fondamentale.
+
+\subsection{5.4. Courbure implicite ATMF}
+
+De meme :
+
+\[
+\boxed{
+\left.\frac{\partial^2 \widehat{\sigma}_{K,T}}{\partial (\ln K)^2}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \left(\frac{t}{T}\right)^2\beta(t)\,dt.
+}
+\]
+
+\subsection{5.5. Interpretation du poids \(t/T\)}
+
+Le poids \(t/T\) n'est pas un hasard.
+
+Pour un strike \(K\) donne, le point pertinent a la date \(t\) est centre sur :
+
+\[
+\frac{t}{T}x_K.
+\]
+
+Donc :
+
+\begin{itemize}
+\item au debut (\(t\approx 0\)), la contrainte finale \(K\) ne compte presque pas ;
+\item a la fin (\(t\approx T\)), elle compte presque integralement.
+\end{itemize}
+
+Autrement dit, le skew implicite proche du forward est une \textbf{moyenne temporelle non uniforme} du skew local : les temps proches de la maturite pesent davantage.
+
+\subsection{5.6. Cas ou \(\alpha,\beta\) sont constants}
+
+Si \(\alpha(t)\equiv \alpha\) et \(\beta(t)\equiv \beta\), alors :
+
+\[
+\mathcal{S}_T=\frac{\alpha}{2},
+\qquad
+\left.\frac{\partial^2 \widehat{\sigma}_{K,T}}{\partial (\ln K)^2}\right|_{K=F_T}
+=
+\frac{\beta}{3}.
+\]
+
+Interpretation :
+
+\begin{itemize}
+\item le skew implicite vaut \textbf{la moitie} du skew local ;
+\item la courbure implicite vaut \textbf{un tiers} de la courbure locale.
+\end{itemize}
+
+\subsection{5.7. Cas d'une decroissance en loi de puissance}
+
+Supposons
+
+\[
+\alpha(t)=
+\begin{cases}
+\alpha_0, & t\le \tau_0,\\
+\alpha_0(\tau_0/t)^\gamma, & t>\tau_0.
+\end{cases}
+\]
+
+Alors, pour \(T\) grand devant \(\tau_0\),
+
+\[
+\mathcal{S}_T
+\sim
+\frac{1}{2-\gamma}
+\alpha_0\left(\frac{\tau_0}{T}\right)^\gamma.
+\]
+
+Donc :
+
+\begin{itemize}
+\item le skew implicite decroit avec \textbf{le meme exposant} \(\gamma\) que le skew local ;
+\item seule change la constante multiplicative \(1/(2-\gamma)\).
+\end{itemize}
+
+\bigskip\hrule\bigskip
+
+\section{6. Dependance en \(\alpha(t)\), mouvement avec le spot et dynamique ATMF}
+
+Cette partie est cruciale pour un oral, car elle explique comment un modele local vol fait bouger le smile quand le spot varie.
+
+\subsection{6.1. Derivee par rapport au strike}
+
+Dans la formule faible-local-vol,
+
+\[
+\ln S(t,y)
+=
+\ln F_t+\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y.
+\]
+
+A spot initial fixe, si l'on derive par rapport a \(\ln K\), on a :
+
+\[
+\frac{\partial \ln S(t,y)}{\partial \ln K}=\frac{t}{T}.
+\]
+
+Donc
+
+\[
+\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln K}
+=
+\frac{1}{T}\int_0^T dt\int_{\mathbb{R}}\phi(y)\,
+\frac{t}{T}\,
+\frac{\partial \sigma_{\mathrm{loc}}}{\partial \ln S}(t,S(t,y)).
+\]
+
+Au voisinage ATMF, \(\partial \sigma_{\mathrm{loc}}/\partial \ln S=\alpha(t)+O(x)\), d'ou
+
+\[
+\left.\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt.
+\]
+
+\subsection{6.2. Derivee par rapport au spot initial a strike fixe}
+
+Maintenant \(K\) est fixe et on derive par rapport a \(\ln S_0\). Comme
+
+\[
+x_K=\ln K-\ln S_0-(r-q)T,
+\]
+
+on a \(\partial x_K/\partial \ln S_0=-1\), tandis que \(\partial \ln F_t/\partial \ln S_0=1\). Par suite :
+
+\[
+\frac{\partial \ln S(t,y)}{\partial \ln S_0}
+=
+1-\frac{t}{T}.
+\]
+
+Donc
+
+\[
+\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln S_0}
+=
+\frac{1}{T}\int_0^T dt\int_{\mathbb{R}}\phi(y)\,
+\left(1-\frac{t}{T}\right)
+\frac{\partial \sigma_{\mathrm{loc}}}{\partial \ln S}(t,S(t,y)).
+\]
+
+Au voisinage ATMF :
+
+\[
+\boxed{
+\left.\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln S_0}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \left(1-\frac{t}{T}\right)\alpha(t)\,dt.
+}
+\]
+
+\subsection{6.3. Interpretation du poids \(1-t/T\)}
+
+Cette fois, les temps courts pesent davantage.
+
+Intuition :
+
+\begin{itemize}
+\item quand on bouge le spot aujourd'hui, l'effet se transmet surtout au debut de la trajectoire ;
+\item a l'approche de l'echeance, la contrainte terminale \(K\) prend le dessus et "ecrase" cet effet.
+\end{itemize}
+
+\subsection{6.4. Dynamique de la volatilite ATMF}
+
+Pour l'ATMF, le strike n'est pas fixe : il suit le forward,
+
+\[
+K=F_T(S_0).
+\]
+
+Donc la derivee totale vaut
+
+\[
+\frac{d\widehat{\sigma}_{F_T,T}}{d\ln S_0}
+=
+\left.\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln S_0}\right|_{K=F_T}
++
+\left.\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+\frac{d\ln F_T}{d\ln S_0}.
+\]
+
+Or \(d\ln F_T/d\ln S_0=1\). Ainsi :
+
+\[
+\frac{d\widehat{\sigma}_{F_T,T}}{d\ln S_0}
+=
+\frac{1}{T}\int_0^T \left(1-\frac{t}{T}\right)\alpha(t)\,dt
++
+\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt.
+\]
+
+Les poids se somment en \(1\), donc :
+
+\[
+\boxed{
+\frac{d\widehat{\sigma}_{F_T,T}}{d\ln S_0}
+=
+\frac{1}{T}\int_0^T \alpha(t)\,dt.
+}
+\]
+
+\subsection{6.5. Interpretation fondamentale}
+
+La dynamique de la vol ATMF n'est pas libre :
+
+\[
+\text{ATMF move}
+=
+\text{moyenne temporelle uniforme du skew local } \alpha(t).
+\]
+
+Autrement dit, toute la dynamique de la vol ATMF dans le modele local vol est \textbf{encodee dans la structure par terme de \(\alpha(t)\)}.
+
+\bigskip\hrule\bigskip
+
+\section{7. Definition et interpretation de \(R_T\)}
+
+On appelle \textbf{Skew Stickiness Ratio} ou \textbf{ratio de rigidite du skew} :
+
+\[
+\boxed{
+R_T
+:=
+\frac{
+\dfrac{d\widehat{\sigma}_{F_T,T}}{d\ln S_0}
+}{
+\left.\dfrac{\partial \widehat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+}
+=
+\frac{\int_0^T \alpha(t)\,dt}
+{\int_0^T \frac{t}{T}\alpha(t)\,dt}.
+}
+\]
+
+\subsection{7.1. Signification}
+
+Le denominateur est le \textbf{skew ATMF} :
+
+\[
+\mathcal{S}_T
+=
+\left.\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}.
+\]
+
+Le numerateur est le \textbf{mouvement de la vol ATMF} quand le spot bouge.
+
+Donc \(R_T\) mesure :
+
+> de combien la vol ATMF bouge, exprimee en unites de skew ATMF.
+
+\subsection{7.2. Regimes de marche de reference}
+
+\subsubsection{Sticky-delta}
+
+Si la surface implicite reste fixe en moneyness, alors la vol ATMF ne bouge pas quand le spot bouge :
+
+\[
+\frac{d\widehat{\sigma}_{F_T,T}}{d\ln S_0}=0,
+\qquad
+R_T=0.
+\]
+
+\subsubsection{Sticky-strike}
+
+Si les volatilites a strike fixe ne bougent pas, alors le mouvement de la vol ATMF vient uniquement du fait que l'ATMF se deplace le long de la courbe en strike. On obtient :
+
+\[
+\frac{d\widehat{\sigma}_{F_T,T}}{d\ln S_0}
+=
+\left.\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T},
+\qquad
+R_T=1.
+\]
+
+\subsubsection{Local vol avec skew local constant}
+
+Si \(\alpha(t)\equiv \alpha\), alors
+
+\[
+\frac{d\widehat{\sigma}_{F_T,T}}{d\ln S_0}
+=\alpha,
+\qquad
+\mathcal{S}_T=\frac{\alpha}{2},
+\qquad
+R_T=2.
+\]
+
+Conclusion :
+
+\begin{itemize}
+\item sticky-delta : \(R_T=0\),
+\item sticky-strike : \(R_T=1\),
+\item local vol classique : souvent \(R_T\) proche de \(2\) a courte maturite.
+\end{itemize}
+
+\subsection{7.3. Formule en fonction du skew ATMF lui-meme}
+
+Posons
+
+\[
+\delta_T:=\mathcal{S}_T
+=
+\frac{1}{T^2}\int_0^T t\,\alpha(t)\,dt.
+\]
+
+Alors
+
+\[
+T^2\delta_T=\int_0^T t\,\alpha(t)\,dt.
+\]
+
+En derivant :
+
+\[
+2T\delta_T+T^2\delta_T'=T\alpha(T),
+\]
+
+soit
+
+\[
+\alpha(T)=2\delta_T+T\delta_T'.
+\]
+
+En integrant de \(0\) a \(T\) :
+
+\[
+\int_0^T \alpha(t)\,dt
+=
+\int_0^T \left(2\delta_t+t\delta_t'\right)dt
+=
+\int_0^T \delta_t\,dt + T\delta_T.
+\]
+
+Donc
+
+\[
+\frac{d\widehat{\sigma}_{F_T,T}}{d\ln S_0}
+=
+\delta_T+\frac{1}{T}\int_0^T \delta_t\,dt.
+\]
+
+Finalement :
+
+\[
+\boxed{
+R_T
+=
+1+\frac{1}{T}\int_0^T \frac{\delta_t}{\delta_T}\,dt.
+}
+\]
+
+\subsection{7.4. Consequences importantes}
+
+\subsubsection{Si le skew ATMF est plat en maturite}
+
+Si \(\delta_t\equiv \delta\), alors :
+
+\[
+R_T=1+\frac{1}{T}\int_0^T 1\,dt=2.
+\]
+
+C'est la celebre \textbf{regle du \(R=2\)}.
+
+\subsubsection{Quand \(T\to 0\)}
+
+Si \(\delta_t\) est continue au voisinage de \(0\), alors
+
+\[
+\frac{1}{T}\int_0^T \frac{\delta_t}{\delta_T}\,dt \longrightarrow 1,
+\]
+
+donc
+
+\[
+\boxed{R_T\longrightarrow 2 \quad \text{quand } T\to 0.}
+\]
+
+Cette limite est importante en pratique : le modele local vol impose un smile de court terme particulierement rigide.
+
+\bigskip\hrule\bigskip
+
+\section{8. Version generale : \(\overline{\sigma}(t)\) non constante}
+
+Si l'on ne developpe pas autour d'une constante \(\sigma_0\), mais autour d'une structure par terme deterministe \(\overline{\sigma}(t)\), alors
+
+\[
+\omega_t=\int_0^t \overline{\sigma}^2(u)\,du,
+\qquad
+\widehat{\sigma}_t^2=\frac{\omega_t}{t},
+\qquad
+\widehat{\sigma}_T^2=\frac{\omega_T}{T}.
+\]
+
+Dans la formule generale, le coefficient \(t/T\) est remplace par :
+
+\[
+\frac{\omega_t}{\omega_T}
+=
+\frac{\widehat{\sigma}_t^2 t}{\widehat{\sigma}_T^2 T}.
+\]
+
+Comme on passe ensuite de la variance a la volatilite, un facteur
+
+\[
+\frac{\overline{\sigma}(t)}{\widehat{\sigma}_T}
+\]
+
+apparait.
+
+On obtient donc :
+
+\[
+\boxed{
+\left.\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T
+\frac{\widehat{\sigma}_t^2 t}{\widehat{\sigma}_T^2 T}
+\frac{\overline{\sigma}(t)}{\widehat{\sigma}_T}
+\alpha(t)\,dt.
+}
+\]
+
+\[
+\boxed{
+\left.\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln S_0}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T
+\left(
+1-\frac{\widehat{\sigma}_t^2 t}{\widehat{\sigma}_T^2 T}
+\right)
+\frac{\overline{\sigma}(t)}{\widehat{\sigma}_T}
+\alpha(t)\,dt.
+}
+\]
+
+et
+
+\[
+\boxed{
+\frac{d\widehat{\sigma}_{F_T,T}}{d\ln S_0}
+=
+\frac{1}{T}\int_0^T
+\frac{\overline{\sigma}(t)}{\widehat{\sigma}_T}\alpha(t)\,dt.
+}
+\]
+
+Ces formules generiques montrent que la logique precedente survit :
+
+\begin{itemize}
+\item un poids associe a l'effet-strike ;
+\item un poids associe a l'effet-spot ;
+\item et leur somme donne la dynamique ATMF.
+\end{itemize}
+
+\bigskip\hrule\bigskip
+
+\section{9. Section 2.4.6 -- Resultat exact a courte maturite}
+
+Cette section est tres importante, car elle fournit un resultat \textbf{exact}, et non plus perturbatif.
+
+\subsection{9.1. Point de depart : la formule de Dupire}
+
+Dans les coordonnees \((T,y)\), avec
+
+\[
+y=\ln(K/F_T),
+\]
+
+Dupire permet d'exprimer la volatilite locale en fonction de la surface implicite \(\widehat{\sigma}(T,y)\).
+
+Quand \(T\to 0\), les termes dominants de cette formule donnent :
+
+\[
+\sigma^2(0,S_0 e^y)
+=
+\frac{\widehat{\sigma}^2(0,y)}
+\left(y\,\widehat{\sigma}(0,y)\,\partial_y\widehat{\sigma}(0,y)-1\right)^2}.
+\]
+
+En prenant la racine et en reordonnant :
+
+\[
+\frac{1}{\sigma(0,S_0 e^y)}
+=
+\pm\left(\frac{y}{\widehat{\sigma}(0,y)}\right)'.
+\]
+
+On choisit le signe compatible avec des volatilites positives, puis on integre entre \(0\) et \(y\) :
+
+\[
+\int_0^y \frac{du}{\sigma(0,S_0 e^u)}
+=
+\frac{y}{\widehat{\sigma}(0,y)}.
+\]
+
+Donc :
+
+\[
+\boxed{
+\frac{1}{\widehat{\sigma}(0,y)}
+=
+\frac{1}{y}\int_0^y \frac{du}{\sigma(0,S_0 e^u)}.
+}
+\]
+
+En revenant a la variable \(K=S_0 e^y\) :
+
+\[
+\boxed{
+\frac{1}{\widehat{\sigma}(0,K)}
+=
+\frac{1}{\ln(K/S_0)}
+\int_{S_0}^{K}\frac{dS}{S\,\sigma_{\mathrm{loc}}(0,S)}.
+}
+\]
+
+\subsection{9.2. Pourquoi c'est une moyenne harmonique}
+
+Ecrite autrement :
+
+\[
+\frac{1}{\widehat{\sigma}(0,K)}
+=
+\text{moyenne de } \frac{1}{\sigma_{\mathrm{loc}}(0,S)}
+\text{ sur l'intervalle logarithmique entre } S_0 \text{ et } K.
+\]
+
+Ce n'est donc pas :
+
+\begin{itemize}
+\item ni une moyenne arithmetique de \(\sigma_{\mathrm{loc}}\),
+\item ni une moyenne quadratique.
+\end{itemize}
+
+C'est une \textbf{moyenne harmonique}.
+
+\subsection{9.3. Interpretation intuitive}
+
+Quand \(T\to 0\) :
+
+\begin{itemize}
+\item il n'y a pratiquement plus de moyenne temporelle ;
+\item le mouvement se joue sur une tres courte echelle ;
+\item ce qui compte est la "difficulte locale" a traverser les niveaux entre \(S_0\) et \(K\).
+\end{itemize}
+
+Si \(\sigma_{\mathrm{loc}}(0,S)\) devient tres faible sur une zone intermediaire, l'actif ne peut presque pas traverser cette zone a temps tres court. Il est donc naturel que l'implicite correspondante baisse tres fortement ; la moyenne harmonique capture exactement cela.
+
+\subsection{9.4. Cas ATM}
+
+Quand \(K\to S_0\), on retrouve :
+
+\[
+\widehat{\sigma}(0,S_0)=\sigma_{\mathrm{loc}}(0,S_0).
+\]
+
+Ce point est coherent avec l'intuition : a echeance instantanee, l'implicite ATM lit directement la vol locale au point initial.
+
+\bigskip\hrule\bigskip
+
+\section{10. Lien avec la formule de Dupire}
+
+Le lien avec Dupire est double.
+
+\subsection{10.1. Dupire direct}
+
+La formule de Dupire exprime :
+
+\[
+\sigma_{\mathrm{loc}}^2(T,K)
+=
+\frac{\partial_T C(T,K)+(r-q)K\partial_K C(T,K)+qC(T,K)}
+\frac12 K^2 \partial_{KK}C(T,K)
+.
+\]
+
+Autrement dit :
+
+\begin{itemize}
+\item si la surface de prix (ou d'implicites) est connue,
+\item on peut reconstruire la fonction locale.
+\end{itemize}
+
+\subsection{10.2. Le chapitre 2.4 fait le chemin inverse}
+
+Le probleme inverse :
+
+\[
+\sigma_{\mathrm{loc}}(t,S) \mapsto \widehat{\sigma}(K,T)
+\]
+
+n'admet pas de formule simple exacte en general. Bergomi fournit :
+
+\begin{enumerate}
+\item une identite exacte mais implicite ;
+\item une approximation utile a l'ordre 1 ;
+\item un resultat exact en petite maturite.
+\end{enumerate}
+
+\subsection{10.3. Point conceptuel}
+
+Dupire permet une calibration parfaite aux vanilles a la date initiale. Mais cela ne veut pas dire que la dynamique induite du smile est realiste. C'est justement le sujet profond du chapitre 2.4 : \textbf{calibrer n'est pas dynamiser correctement}.
+
+\bigskip\hrule\bigskip
+
+\section{11. Lien avec les modeles de volatilite stochastique}
+
+\subsection{11.1. Comparaison generale}
+
+Dans un modele de volatilite stochastique :
+
+\[
+\begin{cases}
+dS_t=(r-q)S_t\,dt+\sqrt{v_t}S_t\,dW_t^S,\\
+dv_t=\cdots
+\end{cases}
+\]
+
+la surface implicite future depend d'un facteur latent aleatoire \(v_t\). Le smile peut donc bouger "de lui-meme", pas seulement parce que le spot a bouge.
+
+Dans un modele local vol, au contraire :
+
+\begin{itemize}
+\item la volatilite instantanee est une fonction deterministe de \((t,S_t)\) ;
+\item toute la dynamique implicite est entierement forcee par la trajectoire du spot.
+\end{itemize}
+
+\subsection{11.2. Consequence sur le SSR}
+
+Les modeles stochastiques equity produisent souvent des dynamics plus proches de :
+
+\begin{itemize}
+\item sticky-delta a court terme,
+\item ou d'un regime intermediaire entre sticky-delta et sticky-strike.
+\end{itemize}
+
+Le modele local vol, lui, tend souvent a produire un comportement \textbf{trop rigide}, avec :
+
+\[
+R_T \approx 2 \quad \text{a courte maturite}.
+\]
+
+\subsection{11.3. Interpretation financiere}
+
+Sur le marche equity, quand le spot baisse :
+
+\begin{itemize}
+\item la skew monte souvent ;
+\item mais la vol ATMF ne reagit pas exactement comme le predirait un modele local vol pur.
+\end{itemize}
+
+Le smile observe est en pratique moins "contraint" que dans local vol. C'est une raison majeure pour laquelle les modeles de volatilite stochastique sont preferes pour la dynamique et la couverture.
+
+\subsection{11.4. Lien conceptuel avec la projection markovienne}
+
+Un modele local vol peut etre vu comme une projection markovienne qui reproduit les lois marginales des vanilles a chaque maturite. Mais :
+
+\begin{itemize}
+\item reproduire les marges n'implique pas reproduire les dynamiques conditionnelles ;
+\item donc un modele local vol peut calibrer parfaitement la surface initiale tout en ayant une dynamique de smile peu realiste.
+\end{itemize}
+
+\bigskip\hrule\bigskip
+
+\section{12. Warnings, limites et zones de validite}
+
+\subsection{12.1. La formule weak-local-vol est une approximation d'ordre 1}
+
+Elle ne doit pas etre surinterpretee.
+
+Elle est tres utile pour :
+
+\begin{itemize}
+\item comprendre les dependances qualitatives ;
+\item extraire le role de \(\alpha(t)\), \(\beta(t)\), \(R_T\) ;
+\item faire des asymptotiques pres du forward.
+\end{itemize}
+
+Elle est insuffisante pour :
+
+\begin{itemize}
+\item reproduire avec precision les niveaux absolus de smile sur des equities a fort skew ;
+\item faire du pricing/trading fin sans resolution numerique.
+\end{itemize}
+
+\subsection{12.2. Le developpement pres du forward est local}
+
+Les formules en \(\alpha(t)\) et \(\beta(t)\) decrivent :
+
+\begin{itemize}
+\item le skew ATMF ;
+\item la courbure ATMF ;
+\end{itemize}
+
+mais pas necessairement les ailes du smile.
+
+\subsection{12.3. Risque de confusion entre exact et approximatif}
+
+Il faut distinguer :
+
+\begin{itemize}
+\item l'identite exacte sur \(\widehat{\sigma}^2\),
+\item l'approximation d'ordre 1 sur \(\widehat{\sigma}\),
+\item et la formule exacte a courte maturite sur \(1/\widehat{\sigma}\).
+\end{itemize}
+
+Ce sont trois regimes mathematiques differents.
+
+\subsection{12.4. Limites structurelles du modele local vol}
+
+Le modele local vol :
+
+\begin{itemize}
+\item calibre parfaitement les vanilles a \(t=0\) ;
+\item hedge bien les vanilles "statistiquement" si la surface ne bouge pas de maniere trop exogene ;
+\item mais impose une dynamique de smile qui peut etre tres irrealisable.
+\end{itemize}
+
+En particulier :
+
+\begin{itemize}
+\item \(R_T\) trop eleve ;
+\item smile trop rigide ;
+\item mauvaise gestion des mouvements de surface non expliques par le spot.
+\end{itemize}
+
+\bigskip\hrule\bigskip
+
+\section{13. Resume ultra-court a retenir pour l'examen}
+
+\begin{enumerate}
+\item \textbf{Identite exacte} :
+\end{enumerate}
+
+\[
+\widehat{\sigma}_{K,T}^{\,2}
+=
+\frac{
+\mathbb{E}\!\left[\int_0^T \text{dollar gamma}\times \sigma_{\mathrm{loc}}^2\,dt\right]
+}{
+\mathbb{E}\!\left[\int_0^T \text{dollar gamma}\,dt\right]
+}.
+\]
+
+\begin{enumerate}
+\item \textbf{Approximation weak-local-vol} :
+\end{enumerate}
+
+\[
+\widehat{\sigma}_{K,T}
+\approx
+\frac{1}{T}\int_0^T dt\int \phi(y)\,
+\sigma_{\mathrm{loc}}(t,S(t,y))\,dy.
+\]
+
+\begin{enumerate}
+\item \textbf{Skew implicite ATMF} :
+\end{enumerate}
+
+\[
+\mathcal{S}_T
+=
+\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt.
+\]
+
+\begin{enumerate}
+\item \textbf{Mouvement a strike fixe} :
+\end{enumerate}
+
+\[
+\left.\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln S_0}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \left(1-\frac{t}{T}\right)\alpha(t)\,dt.
+\]
+
+\begin{enumerate}
+\item \textbf{Mouvement de la vol ATMF} :
+\end{enumerate}
+
+\[
+\frac{d\widehat{\sigma}_{F_T,T}}{d\ln S_0}
+=
+\frac{1}{T}\int_0^T \alpha(t)\,dt.
+\]
+
+\begin{enumerate}
+\item \textbf{Ratio de rigidite} :
+\end{enumerate}
+
+\[
+R_T=
+\frac{d\widehat{\sigma}_{F_T,T}/d\ln S_0}
+{\mathcal{S}_T},
+\qquad
+R_T\to 2 \text{ quand } T\to 0.
+\]
+
+\begin{enumerate}
+\item \textbf{Petite maturite exacte} :
+\end{enumerate}
+
+\[
+\frac{1}{\widehat{\sigma}(0,K)}
+=
+\frac{1}{\ln(K/S_0)}
+\int_{S_0}^{K}\frac{dS}{S\,\sigma_{\mathrm{loc}}(0,S)}.
+\]
+
+\bigskip\hrule\bigskip
+
+\section{14. Phrase de conclusion pour un oral}
+
+Le point cle du chapitre 2.4 est que le modele local vol ne se contente pas de calibrer une surface : il impose une dynamique tres specifique du smile. Cette dynamique est en grande partie codee par le skew local instantane \(\alpha(t)\), et c'est precisement ce caractere trop rigide -- visible par exemple via \(R_T\approx 2\) a courte maturite -- qui explique les limites financieres du modele local vol face aux modeles de volatilite stochastique.
+\end{document}
