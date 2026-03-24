@@ -85,7 +85,7 @@ Les poids sont positifs pour une option vanille convexe, et ils mesurent l'impor
 \section{4) Pourquoi le poids est-il un dollar gamma ?}
 
 \textbf{Réponse.}
-Le terme \(S_t^2\Gamma_t\) apparaît naturellement quand on écrit le P\\&L d'une stratégie de couverture delta. Le coût de mauvaise spécification de la volatilité instantanée se lit dans le terme gamma/theta, et c'est ce terme qui pondère l'écart entre la variance vraie et la variance du modèle de base.
+Le terme \(S_t^2\Gamma_t\) apparaît naturellement quand on écrit le P\&{}L d'une stratégie de couverture delta. Le coût de mauvaise spécification de la volatilité instantanée se lit dans le terme gamma/theta, et c'est ce terme qui pondère l'écart entre la variance vraie et la variance du modèle de base.
 
 \bigskip\hrule\bigskip
 
@@ -99,7 +99,7 @@ Non. Elle donne exactement \(\hat\sigma^2\), mais de manière implicite, car \(\
 \section{6) Quel est le rôle du modèle de base dans la démonstration ?}
 
 \textbf{Réponse.}
-On choisit un modèle de base \(P_1\) pour couvrir delta une option dont la dynamique réelle suit un autre modèle \(P_2\). L'écart entre les deux prix est donné par l'espérance du P\\&L gamma/theta accumulé. En choisissant judicieusement le modèle de base, on obtient des identités exactes reliant volatilité locale et volatilité implicite.
+On choisit un modèle de base \(P_1\) pour couvrir delta une option dont la dynamique réelle suit un autre modèle \(P_2\). L'écart entre les deux prix est donné par l'espérance du P\&{}L gamma/theta accumulé. En choisissant judicieusement le modèle de base, on obtient des identités exactes reliant volatilité locale et volatilité implicite.
 
 \bigskip\hrule\bigskip
 
@@ -111,7 +111,7 @@ Dupire fournit
 \sigma_{\mathrm{loc}}^2(T,K)
 =
 \frac{\partial_T C(T,K)+(r-q)K\partial_K C(T,K)+qC(T,K)}
-\frac12 K^2\partial_{KK}C(T,K)}.
+{\frac12 K^2\partial_{KK}C(T,K)}.
 \]
 Il s'agit d'une formule explicite de \(\sigma_{\mathrm{loc}}\) en fonction de la surface vanille. Le chapitre 2.4 étudie le problème dual : sachant \(\sigma_{\mathrm{loc}}\), quel smile implicite obtient-on ?
 
@@ -554,7 +554,7 @@ L'écart entre les deux modèles n'apparaît alors que dans le terme quadratique
 \[
 \frac12 S_t^2 \Gamma_t(\sigma_2^2-\sigma_1^2),
 \]
-ce qui donne une interprétation directe en P\\&L de couverture delta.
+ce qui donne une interprétation directe en P\&{}L de couverture delta.
 
 \bigskip\hrule\bigskip
 
