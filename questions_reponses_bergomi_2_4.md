@@ -479,3 +479,154 @@ Le message central est :
 
 **Réponse.**  
 Le résultat de courte maturité montre qu'à l'échelle infinitésimale, le lien entre local vol et implicite n'est plus une moyenne temporelle de variances, mais une moyenne spatiale harmonique des inverses de volatilité. Cela illustre la différence profonde entre asymptotique en temps et approximation perturbative.
+
+---
+
+## 41) Quelle est l'EDP de pricing satisfaite par une option dans un modèle de volatilité locale ?
+
+**Réponse.**  
+Si
+\[
+dS_t=(r-q)S_t\,dt+\sigma_{\mathrm{loc}}(t,S_t)S_t\,dW_t,
+\]
+alors le prix \(P(t,S)\) d'une option européenne satisfait
+\[
+\partial_t P+(r-q)S\partial_S P+\frac12 \sigma_{\mathrm{loc}}^2(t,S)S^2\partial_{SS}P-rP=0,
+\]
+avec condition terminale \(P(T,S)=f(S)\).  
+Cette EDP est précisément celle utilisée dans la démonstration par Itô/gamma/theta.
+
+---
+
+## 42) Quel est le lien entre cette EDP et la formule de Feynman-Kac ?
+
+**Réponse.**  
+La formule de Feynman-Kac dit que la solution de l'EDP précédente s'écrit comme l'espérance risque-neutre actualisée du payoff :
+\[
+P(t,S)=\mathbb E^{\mathbb Q}\!\left[e^{-r(T-t)}f(S_T)\mid S_t=S\right].
+\]
+Le cadre local vol est donc à la fois probabiliste (SDE) et analytique (EDP), ce qui fait exactement le lien avec le cours.
+
+---
+
+## 43) Pourquoi travaille-t-on sous la mesure risque-neutre ?
+
+**Réponse.**  
+Parce que sous absence d'arbitrage, le prix d'une option européenne peut être écrit comme une espérance actualisée sous une mesure \(\mathbb Q\) telle que le sous-jacent actualisé soit une martingale.  
+Dans ce cadre, la dérive devient \(r-q\), ce qui permet d'utiliser les outils standards de pricing et d'obtenir l'EDP de valorisation.
+
+---
+
+## 44) Quelle est l'idée mathématique derrière la dérivation gamma/theta de Bergomi ?
+
+**Réponse.**  
+On applique Itô à la valeur actualisée d'une option pricée dans un modèle de base \(P_1\), tandis que la dynamique réelle du sous-jacent suit un autre modèle.  
+L'écart entre les deux modèles n'apparaît alors que dans le terme quadratique
+\[
+\frac12 S_t^2 \Gamma_t(\sigma_2^2-\sigma_1^2),
+\]
+ce qui donne une interprétation directe en P\&L de couverture delta.
+
+---
+
+## 45) Pourquoi la convexité de l'option joue-t-elle un rôle central dans ces formules ?
+
+**Réponse.**  
+Parce que les poids dans l'identité exacte sont des dollar gammas \(S_t^2\Gamma_t\).  
+Une option très convexe est plus sensible aux erreurs de volatilité instantanée. C'est donc la convexité, et non seulement le niveau de spot visité, qui détermine quelles zones de la local vol influencent réellement l'implicite.
+
+---
+
+## 46) Quelle différence entre calibration statique et dynamique du smile ?
+
+**Réponse.**  
+La calibration statique consiste à reproduire exactement la surface vanille observée à une date donnée.  
+La dynamique du smile décrit la manière dont cette surface bouge lorsque le spot et le temps évoluent.  
+Le modèle local vol réussit très bien la calibration statique, mais peut produire une dynamique peu réaliste.
+
+---
+
+## 47) Pourquoi le modèle local vol peut-il calibrer parfaitement les vanilles aujourd'hui ?
+
+**Réponse.**  
+Parce que la formule de Dupire permet, sous des hypothèses de régularité et d'absence d'arbitrage, de construire une fonction \(\sigma_{\mathrm{loc}}(t,S)\) telle que les prix de toutes les options européennes soient reproduits exactement à la date initiale.
+
+---
+
+## 48) Pourquoi cela ne garantit-il pas une bonne modélisation des options exotiques ?
+
+**Réponse.**  
+Parce que les options exotiques dépendent de la dynamique future de la distribution du sous-jacent, pas seulement de la marginae à une date donnée.  
+Deux modèles pouvant calibrer les mêmes vanilles aujourd'hui peuvent générer des dynamiques futures très différentes, donc des prix exotiques différents.
+
+---
+
+## 49) Quelle est la différence essentielle entre local vol et volatilité stochastique dans le cours ?
+
+**Réponse.**  
+Dans un modèle local vol, la volatilité instantanée est une fonction déterministe de \((t,S_t)\).  
+Dans un modèle de volatilité stochastique, la variance suit son propre facteur aléatoire, par exemple
+\[
+dV_t = b(V_t)\,dt+\eta(V_t)\,dB_t,
+\]
+ce qui introduit une source de risque supplémentaire et rend la dynamique du smile plus flexible.
+
+---
+
+## 50) En quoi la présence d'un facteur de volatilité supplémentaire change-t-elle la dynamique du smile ?
+
+**Réponse.**  
+À spot donné, l'avenir n'est plus entièrement déterminé par \(S_t\) seul.  
+Le facteur de variance \(V_t\) modifie la loi future de \(S_T\), donc la surface implicite future peut bouger sans être complètement asservie au spot. C'est ce qui rend les modèles stochastiques plus réalistes pour les dynamiques de smile.
+
+---
+
+## 51) Pourquoi le cours insiste-t-il souvent sur la distinction entre variable d'état et variable de calibration ?
+
+**Réponse.**  
+Parce qu'en local vol, la surface implicite sert à calibrer une fonction \(\sigma_{\mathrm{loc}}(t,S)\), mais une fois le modèle fixé, la seule variable d'état est \(S_t\) (plus le temps).  
+À l'inverse, dans un modèle stochastique, la volatilité future elle-même fait partie de l'état. Cela change profondément la dynamique conditionnelle du smile.
+
+---
+
+## 52) Pourquoi le résultat de courte maturité est-il cohérent avec les asymptotiques vues en cours ?
+
+**Réponse.**  
+À très courte maturité, la dynamique a trop peu de temps pour effectuer une moyenne temporelle significative.  
+Les comportements dominants deviennent alors locaux en espace, ce qui explique que l'on obtienne une formule intégrale spatiale plutôt qu'une moyenne de variances sur le temps.
+
+---
+
+## 53) Quel est le message "cours" derrière la formule de Dupire ?
+
+**Réponse.**  
+Le message est que les prix vanilles pour toutes maturités et tous strikes contiennent assez d'information pour reconstruire la variance locale instantanée, via les dérivées en temps et en strike de la surface des calls.  
+Autrement dit : la surface vanille code une dynamique markovienne unidimensionnelle compatible avec elle.
+
+---
+
+## 54) Pourquoi la régularité de la surface implicite est-elle importante ?
+
+**Réponse.**  
+Parce que la formule de Dupire utilise des dérivées \(\partial_T C\) et \(\partial_{KK}C\).  
+Sans régularité suffisante ni absence d'arbitrage statique, la local vol extraite peut être instable, non positive, voire n'avoir aucun sens économique.
+
+---
+
+## 55) Pourquoi les examinateurs peuvent-ils te demander Itô ici alors que le sujet est sur le smile ?
+
+**Réponse.**  
+Parce que la démonstration fondatrice de Bergomi repose précisément sur Itô appliqué à \(e^{-rt}P_1(t,S_t)\).  
+Ce chapitre est donc un excellent exemple de pont entre :
+- calcul stochastique,
+- EDP de pricing,
+- interprétation financière en couverture,
+- géométrie du smile.
+
+---
+
+## 56) Si on te demande "quel est le vrai apport de Bergomi par rapport au cours ?", que répondre ?
+
+**Réponse.**  
+Le cours donne généralement les briques fondamentales : mesure risque-neutre, Itô, Feynman-Kac, Dupire, calibration, modèles de volatilité stochastique.  
+Bergomi va plus loin en montrant comment un modèle local vol donné impose une dynamique très spécifique de la surface implicite, et il relie cette dynamique à des objets directement interprétables comme \(\alpha(t)\) et \(R_T\).

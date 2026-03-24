@@ -13,6 +13,54 @@ Il est organise slide par slide.
 
 ---
 
+## Avant la soutenance : liens explicites avec le cours a maitriser
+
+Comme les questions porteront aussi sur le contenu du cours, il faut etre capable de rattacher Bergomi 2.4 aux themes classiques de M2 Probabilites & Finance :
+
+1. **Mesure risque-neutre et dynamique de l'actif**
+   - savoir expliquer pourquoi on ecrit
+   \[
+   dS_t=(r-q)S_t\,dt+\sigma_t S_t\,dW_t
+   \]
+   sous la mesure de pricing ;
+   - savoir distinguer volatilite locale deterministe en \((t,S)\) et volatilite stochastique.
+
+2. **EDP de pricing / Feynman-Kac**
+   - savoir retrouver l'EDP
+   \[
+   \partial_t P+(r-q)S\partial_S P+\frac12 \sigma^2 S^2\partial_{SS}P-rP=0 ;
+   \]
+   - comprendre que l'identite de Bergomi repose sur Itô applique a \(e^{-rt}P(t,S_t)\).
+
+3. **Dupire**
+   - savoir rappeler que Dupire reconstruit \(\sigma_{\mathrm{loc}}(T,K)\) a partir de la surface vanille ;
+   - expliquer que Bergomi regarde le probleme inverse : que devient l'implicite si on part de \(\sigma_{\mathrm{loc}}\) ?
+
+4. **Smile, skew, curvature**
+   - savoir definir rigoureusement
+   \[
+   \partial_{\ln K}\hat{\sigma},\qquad \partial_{\ln K\ln K}\hat{\sigma},
+   \]
+   et expliquer leur interpretation financiere.
+
+5. **Dynamique du smile**
+   - comprendre la difference entre :
+     - mouvement a strike fixe,
+     - mouvement ATMF,
+     - regimes sticky-strike / sticky-delta.
+
+6. **Asymptotiques de courte maturite**
+   - savoir expliquer pourquoi \(T\to 0\) change la nature de la moyenne ;
+   - comprendre la difference entre moyenne temporelle de variances et moyenne spatiale harmonique.
+
+7. **Calibration statique vs dynamique**
+   - point tres classique de cours : un modele peut calibrer la surface a \(t=0\) mais mal decrire sa dynamique future.
+
+Si on te pose une question "de cours", les ponts les plus probables sont donc :
+**Itô / Feynman-Kac / Dupire / smile dynamics / asymptotique courte maturite / calibration vs dynamique.**
+
+---
+
 ## Slide 1 — Du local vol vers l'implicite : la question
 
 ### Temps cible
