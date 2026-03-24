@@ -122,32 +122,8 @@ X(t,y)=\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
 \begin{itemize}
     \item Le skew implicite est une \textbf{moyenne ponderee} du skew local \(\alpha(t)\).
     \item Le poids \(t/T\) donne plus d'importance aux temps proches de la maturite.
+    \item Si \(\alpha(t)\equiv\alpha\), alors le skew implicite ATMF vaut \(\alpha/2\).
 \end{itemize}
-\end{frame}
-
-\begin{frame}{Pourquoi le poids \texorpdfstring{$t/T$}{t/T} ?}
-\small
-\[
-X(t,y)=\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
-\]
-
-\begin{itemize}
-    \item A \(t=0\), le strike final n'a encore \textbf{aucun effet} : poids nul.
-    \item A \(t=T\), le strike final est \textbf{entierement impose} : poids unitaire.
-    \item Donc le skew implicite ne "voit" pas \(\alpha(t)\) uniformement dans le temps.
-\end{itemize}
-
-\vspace{0.2cm}
-\[
-\alpha(t)\ \text{constant}
-\quad \Longrightarrow \quad
-\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
-=\frac{\alpha}{2}.
-\]
-
-\begin{block}{Message}
-La local vol peut avoir un skew instantane \(\alpha\), mais le smile implicite ATMF n'en retient qu'environ la moitie si ce skew est constant dans le temps.
-\end{block}
 \end{frame}
 
 \begin{frame}{Mouvement du smile quand le spot bouge}
