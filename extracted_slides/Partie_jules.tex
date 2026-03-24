@@ -1,0 +1,294 @@
+\subsection{De la volatilité locale à la volatilité implicite}
+
+\begin{frame}{Question du chapitre 2.4}
+\small
+\begin{itemize}
+    \item \textbf{Point de départ :} la formule de Dupire donne \(\sigma_{\mathrm{loc}}(t,S)\) à partir de la surface \(\hat{\sigma}(K,T)\).
+    \item \textbf{Question inverse de Bergomi :} si \(\sigma_{\mathrm{loc}}\) est fixée, comment retrouver et surtout \emph{interpréter} \(\hat{\sigma}(K,T)\) ?
+    \item \textbf{Idée centrale :} l'implicite n'est pas une simple lecture point par point de la local vol ; c'est une \textbf{moyenne pondérée} le long des trajectoires pertinentes pour l'option.
+\end{itemize}
+
+\[
+dS_t=(r-q)S_t\,dt+\sigma_{\mathrm{loc}}(t,S_t)S_t\,dW_t,
+\qquad
+x_K=\ln\!\left(\frac{K}{F_T}\right)
+\]
+
+\vspace{0.2cm}
+\begin{block}{Message à retenir}
+Dans un modèle local vol, le smile implicite est une image \emph{lissée} de la surface de volatilité locale.
+\end{block}
+\end{frame}
+
+\begin{frame}{Identité clé : l'implicite comme moyenne pondérée}
+\small
+\[
+\hat{\sigma}_{KT}^{\,2}
+=
+\frac{
+\mathrm{E}\!\left[\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}(\hat{\sigma}_{KT})\,
+\sigma_{\mathrm{loc}}(t,S_t)^2\,dt\right]
+}{
+\mathrm{E}\!\left[\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}(\hat{\sigma}_{KT})\,dt\right]
+}
+\]
+
+\begin{itemize}
+    \item Le poids est le \textbf{dollar gamma} de l'option.
+    \item La moyenne porte sur le \textbf{temps} et sur les \textbf{trajectoires}.
+    \item Pour une option vanille convexe, ces poids sont positifs.
+\end{itemize}
+
+\begin{alertblock}{Interprétation}
+L'énoncé exact porte sur \(\hat{\sigma}^2\) : \textbf{la variance implicite est une moyenne pondérée de la variance locale.}
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Approximation de ``weak local volatility''}
+\small
+En développant autour d'un Black--Scholes de référence \(\sigma_0\), Bergomi obtient :
+\[
+\hat{\sigma}_{KT}
+\approx
+\frac{1}{T}\int_0^T\!\!dt
+\int_{-\infty}^{+\infty}\phi(y)\,
+\sigma_{\mathrm{loc}}\!\left(
+t,\,
+F_t\exp\!\left(
+\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
+\right)\right)dy
+\]
+avec \(\phi(y)=\dfrac{e^{-y^2/2}}{\sqrt{2\pi}}\).
+
+\begin{itemize}
+    \item \(y=0\) correspond à la \textbf{trajectoire log-linéaire} la plus probable entre \(S_0\) et \(K\).
+    \item Les \(y\neq 0\) ajoutent une dispersion autour de cette trajectoire centrale.
+\end{itemize}
+
+\begin{block}{Intuition}
+L'implicite d'un strike \(K\) regarde surtout la local vol rencontrée entre le spot initial et le strike final.
+\end{block}
+\end{frame}
+
+\subsection{Skew près du forward}
+
+\begin{frame}{Développement près du forward}
+\small
+On suppose la local vol régulière près du forward :
+\[
+\sigma_{\mathrm{loc}}(t,S)
+=
+\bar{\sigma}(t)+\alpha(t)x+\frac{\beta(t)}{2}x^2,
+\qquad
+x=\ln\!\left(\frac{S}{F_t}\right)
+\]
+
+Alors, au premier ordre en \(\alpha,\beta\),
+\[
+\hat{\sigma}_{KT}
+=
+\text{niveau}
+\;+\;
+\left(\frac{1}{T}\int_0^T\frac{t}{T}\alpha(t)\,dt\right)x_K
+\;+\;
+\frac12
+\left(\frac{1}{T}\int_0^T\left(\frac{t}{T}\right)^2\beta(t)\,dt\right)x_K^2
+\;+\;\cdots
+\]
+
+\begin{itemize}
+    \item \(\alpha(t)\) code le \textbf{skew local}.
+    \item \(\beta(t)\) code la \textbf{courbure locale}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Résultat central : le skew implicite ATMF}
+\small
+\[
+\mathcal{S}_T
+:=
+\left.
+\frac{\partial \hat{\sigma}_{KT}}{\partial \ln K}
+\right|_{K=F_T}
+
+=
+\frac{1}{T}\int_0^T \frac{t}{T}\,\alpha(t)\,dt
+\]
+
+\[
+\left.
+\frac{\partial^2 \hat{\sigma}_{KT}}{\partial (\ln K)^2}
+\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T\left(\frac{t}{T}\right)^2\beta(t)\,dt
+\]
+
+\begin{itemize}
+    \item Le noyau \(\tfrac{t}{T}\) \textbf{favorise les dates proches de la maturité}.
+    \item Donc l'implicite lisse le skew local : il en retient une version \textbf{moyennée}.
+\end{itemize}
+
+\begin{alertblock}{Cas constant}
+Si \(\alpha(t)\equiv \alpha\), alors \(\mathcal{S}_T=\alpha/2\). \\
+Si \(\beta(t)\equiv \beta\), alors la courbure implicite vaut \(\beta/3\).
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Rôle de \(\alpha(t)\) : décroissance en maturité}
+\small
+Si le skew local décroit en loi de puissance :
+\[
+\alpha(t)=
+\begin{cases}
+\alpha_0, & t\le \tau_0,\\[0.2cm]
+\alpha_0\left(\dfrac{\tau_0}{t}\right)^\gamma, & t>\tau_0,
+\end{cases}
+\qquad \gamma<2
+\]
+alors
+\[
+\mathcal{S}_T
+\sim
+\frac{1}{2-\gamma}\,\alpha_0\left(\frac{\tau_0}{T}\right)^\gamma
+\qquad (T\gg\tau_0)
+\]
+
+\begin{itemize}
+    \item L'exposant de décroissance est \textbf{conservé}.
+    \item Le passage local vol \(\to\) implicite change surtout le \textbf{facteur d'échelle}.
+\end{itemize}
+
+\begin{block}{Lecture financière}
+Le marché long terme ``voit'' un skew plus faible, mais il hérite du même régime de décroissance.
+\end{block}
+\end{frame}
+
+\subsection{Dynamique ATMF et rigidité du skew}
+
+\begin{frame}{Comment l'ATMF bouge quand le spot bouge ?}
+\small
+À strike fixe puis au point ATMF, on obtient :
+\[
+\left.
+\frac{\partial \hat{\sigma}_{KT}}{\partial \ln S_0}
+\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T\left(1-\frac{t}{T}\right)\alpha(t)\,dt
+\]
+
+Comme \(F_T\) dépend lui-même de \(S_0\), la dérivée \emph{totale} de la vol ATMF est
+\[
+\frac{d\hat{\sigma}_{F_TT}}{d\ln S_0}
+=
+\left.
+\frac{\partial \hat{\sigma}_{KT}}{\partial \ln S_0}
+\right|_{K=F_T}
+
++
+\left.
+\frac{\partial \hat{\sigma}_{KT}}{\partial \ln K}
+\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \alpha(t)\,dt
+\]
+
+\begin{block}{Point clé}
+Le déplacement de la vol ATMF agrège \textbf{tout} le skew local entre \(0\) et \(T\).
+\end{block}
+\end{frame}
+
+\begin{frame}{Définition et interprétation de \(R_T\)}
+\small
+On définit le ratio de rigidité du skew par
+\[
+R_T
+:=
+\frac{\dfrac{d\hat{\sigma}_{F_TT}}{d\ln S_0}}{\mathcal{S}_T}
+\]
+
+En combinant les formules précédentes :
+\[
+R_T
+=
+1+\frac{1}{T\,\mathcal{S}_T}\int_0^T \mathcal{S}_t\,dt
+\]
+
+\begin{itemize}
+    \item \textbf{Sticky-strike :} \(R_T=1\)
+    \item \textbf{Sticky-delta :} \(R_T=0\)
+    \item \textbf{Local vol avec \(\alpha\) constant :} \(R_T=2\)
+\end{itemize}
+
+\begin{alertblock}{Règle du \(R=2\)}
+Dans le cas local vol le plus simple, la vol ATMF bouge \textbf{deux fois plus vite} que le skew ATMF.
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{Si le skew ATMF suit une loi de puissance}
+\small
+Si, empiriquement,
+\[
+\mathcal{S}_T = c\,T^{-\gamma},
+\qquad 0\le \gamma <1,
+\]
+alors
+\[
+\frac{1}{T}\int_0^T \mathcal{S}_t\,dt
+=
+\frac{1}{1-\gamma}\,\mathcal{S}_T
+\]
+et donc
+\[
+R_T
+=
+1+\frac{1}{1-\gamma}
+=
+\frac{2-\gamma}{1-\gamma}
+\]
+
+\begin{itemize}
+    \item \(R_T\) ne dépend alors \textbf{plus de la maturité}.
+    \item Pour \(\gamma=\tfrac12\), on obtient \(R_T=3\).
+\end{itemize}
+\end{frame}
+
+\subsection{Courte maturité, liens et limites}
+
+\begin{frame}{Résultat exact en courte maturité}
+\small
+Quand \(T\to 0\), Bergomi retrouve un résultat exact :
+\[
+\frac{1}{\hat{\sigma}(0,K)}
+=
+\frac{1}{\ln(K/S_0)}
+\int_{S_0}^{K}\frac{dS}{S\,\sigma_{\mathrm{loc}}(0,S)}
+\]
+
+\begin{itemize}
+    \item Ce n'est \textbf{pas} une moyenne arithmétique de \(\sigma_{\mathrm{loc}}\).
+    \item C'est une \textbf{moyenne harmonique} de \(\sigma_{\mathrm{loc}}\) entre \(S_0\) et \(K\).
+\end{itemize}
+
+\begin{block}{Intuition}
+À très courte maturité, il n'y a presque pas de moyenne en temps : ce qui compte est la \textbf{géométrie spatiale} entre le spot et le strike.
+\end{block}
+\end{frame}
+
+\begin{frame}{Ce qu'il faut retenir pour l'oral}
+\small
+\begin{enumerate}
+    \item \textbf{Dupire} : de \(\hat{\sigma}\) vers \(\sigma_{\mathrm{loc}}\).
+    \item \textbf{Bergomi 2.4} : de \(\sigma_{\mathrm{loc}}\) vers \(\hat{\sigma}\) via une \textbf{moyenne pondérée}.
+    \item \(\alpha(t)\) contrôle le \textbf{skew implicite} :
+    \[
+    \mathcal{S}_T=\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt
+    \]
+    \item La dynamique ATMF donne
+    \[
+    \frac{d\hat{\sigma}_{F_TT}}{d\ln S_0}=\frac{1}{T}\int_0^T \alpha(t)\,dt,
+    \qquad
+    R_T=\frac{d\hat{\sigma}_{F_TT}/d\ln S_0}{\mathcal{S}_T}
+    \]
+    \item \textbf{Attention :} les formules de weak local vol décrivent bien le \emph{skew}, mais pas assez précisément les \emph{niveaux} de smile pour le trading.
+\end{enumerate}
+\end{frame}
