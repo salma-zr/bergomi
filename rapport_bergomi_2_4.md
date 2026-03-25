@@ -1,71 +1,222 @@
 # Bergomi, Chapitre 2.4 -- Des volatilites locales aux volatilites implicites
 
-## Objectif du chapitre
+## Ce rapport est re-ecrit pour quelqu'un qui part de zero
 
-Le chapitre 2.4 de Bergomi repond a la question inverse de Dupire :
+L'objectif de cette version est different du precedent rapport :
 
-- **Dupire** : a partir de la surface implicite \(\widehat{\sigma}(K,T)\), retrouver la volatilite locale \(\sigma_{\mathrm{loc}}(t,S)\).
-- **Ici** : en supposant donnee la fonction de volatilite locale \(\sigma_{\mathrm{loc}}(t,S)\), comprendre **quelle surface implicite elle engendre** et surtout **quelle dynamique du smile** elle impose.
+- je ne suppose **pas** que tu comprennes deja ce qu'est un P\&L de couverture ;
+- je ne suppose **pas** que les mots "gamma/theta", "modele de base", "modele reel", "moyenne ponderee" soient clairs ;
+- je vais donc expliquer **d'abord l'idee**, puis seulement **ensuite** les calculs.
 
-Le message central est le suivant :
+Le but est que tu puisses repondre a des questions du type :
 
-1. il existe une **identite exacte** exprimant la **variance implicite** comme une moyenne ponderee de la **variance locale** ;
-2. si la volatilite locale est **faiblement locale** (petite dependance en \(S\)), on obtient une formule exploitable pour la **volatilite implicite elle-meme** ;
-3. pres du forward, le **skew implicite** et la **dynamique de la vol ATMF** sont entierement gouvernes par la structure par terme du **skew local** \(\alpha(t)\) ;
-4. a tres courte maturite, il existe un **resultat exact** : l'inverse de la volatilite implicite est une **moyenne harmonique** de l'inverse de la volatilite locale.
+- "Mais qu'est-ce qu'on est en train de calculer, au juste ?"
+- "Pourquoi le gamma apparait ?"
+- "C'est quoi le P\&L ici ?"
+- "Qu'est-ce que veut dire couvrir delta ?"
+- "Pourquoi on compare deux modeles ?"
+- "Pourquoi ca donne une moyenne ponderee ?"
 
 ---
 
-## 1. Cadre, notations et hypotheses
+## 0. La question de fond du chapitre
 
-On travaille sous la mesure risque-neutre avec :
+Le chapitre 2.4 de Bergomi part d'une question tres simple en apparence :
+
+> Si je connais une fonction de volatilite locale \(\sigma_{\mathrm{loc}}(t,S)\), quelle volatilite implicite \(\widehat{\sigma}(K,T)\) cette fonction engendre-t-elle ?
+
+Autrement dit :
+
+- **probleme de Dupire** : partir du smile implicite et retrouver la local vol ;
+- **probleme de Bergomi ici** : partir de la local vol et comprendre le smile implicite qu'elle produit.
+
+Mais Bergomi veut plus qu'une simple correspondance statique.
+
+Il veut comprendre :
+
+1. quel niveau d'implicite est engendre ;
+2. comment le smile pres du forward se construit ;
+3. pourquoi, dans un modele local vol, la dynamique du smile est tres contrainte.
+
+---
+
+## 1. Rappels de cours indispensables avant Bergomi
+
+### 1.1. Mesure risque-neutre
+
+Sous la mesure risque-neutre, dans un modele de volatilite locale, on ecrit :
 
 \[
 dS_t=(r-q)S_t\,dt+\sigma_{\mathrm{loc}}(t,S_t)S_t\,dW_t.
 \]
 
-On note :
+Ici :
 
-- \(S_0\) : spot initial ;
-- \(F_t=S_0 e^{(r-q)t}\) : forward a maturite \(t\) ;
-- \(K\) : strike ;
-- \(T\) : maturite ;
-- \(x_K=\ln(K/F_T)\) : log-moneyness forward ;
-- \(\widehat{\sigma}_{K,T}\) : volatilite implicite Black-Scholes de l'option europeenne \((K,T)\).
+- \(S_t\) est le prix du sous-jacent ;
+- \(r\) est le taux sans risque ;
+- \(q\) est le taux de dividende / carry ;
+- \(W_t\) est un brownien sous la mesure de pricing ;
+- \(\sigma_{\mathrm{loc}}(t,S)\) est une fonction **deterministe** de \(t\) et \(S\).
 
-On distinguera soigneusement :
+### 1.2. Prix d'une option
 
-- **volatilite locale** : \(\sigma_{\mathrm{loc}}(t,S)\), objet du modele ;
-- **volatilite implicite** : \(\widehat{\sigma}_{K,T}\), objet observe sur le marche.
+Si \(P(t,S)\) designe le prix d'une option europeenne, alors sous des hypotheses standard de regularite, \(P\) satisfait l'EDP :
 
-Dans tout le chapitre, on cherche a comprendre comment \(\widehat{\sigma}_{K,T}\) depend de \(\sigma_{\mathrm{loc}}(t,S)\).
+\[
+\partial_t P+(r-q)S\partial_S P+\frac12 \sigma^2(t,S)S^2\partial_{SS}P-rP=0.
+\]
+
+Cette equation vient du cours via :
+
+- Itô ;
+- absence d'arbitrage ;
+- Feynman-Kac.
+
+### 1.3. Delta, gamma, theta : que signifient ces mots ?
+
+Pour une option de prix \(P(t,S)\) :
+
+- **delta** :
+  \[
+  \Delta=\partial_S P ;
+  \]
+- **gamma** :
+  \[
+  \Gamma=\partial_{SS}P ;
+  \]
+- **theta** :
+  \[
+  \Theta=\partial_t P .
+  \]
+
+Interpretation :
+
+- le **delta** mesure la sensibilite lineaire au spot ;
+- le **gamma** mesure la courbure, donc la sensibilite du delta lui-meme ;
+- le **theta** mesure l'effet du passage du temps.
+
+### 1.4. Qu'est-ce qu'un P\&L ?
+
+Le **P\&L** = "Profit and Loss" = gain/perte d'une position sur un petit intervalle de temps.
+
+Si je suis short une option et que je me couvre en delta, alors sur un petit temps \(dt\), le P\&L residuel est ce qui reste **apres** avoir neutralise le terme lineaire en \(dS_t\).
+
+Le point important du cours est le suivant :
+
+- si la couverture delta est parfaite dans **le bon modele**, le P\&L residuel est celui impose par l'EDP ;
+- si je couvre avec **un mauvais modele de volatilite**, il reste un ecart de P\&L ;
+- cet ecart fait apparaitre naturellement le **gamma**.
+
+### 1.5. Que veut dire "couvrir delta" ?
+
+Supposons que je detienne une position de prix \(P(t,S_t)\).
+
+Sur un petit intervalle de temps, par Itô :
+
+\[
+dP \approx \partial_t P\,dt+\partial_S P\,dS+\frac12 \partial_{SS}P\,d\langle S\rangle.
+\]
+
+Si je prends en face une position de \(-\partial_S P\) actions, le terme en \(dS\) disparait.
+
+Il reste donc essentiellement :
+
+\[
+dP-\partial_S P\,dS
+\approx
+\partial_t P\,dt+\frac12 \partial_{SS}P\,d\langle S\rangle.
+\]
+
+Voila pourquoi, dans une couverture delta, ce qui reste est un terme de type :
+
+- theta ;
+- plus gamma fois variation quadratique.
+
+C'est exactement le coeur de l'idee de Bergomi.
 
 ---
 
-## 2. Section 2.4.1 -- Identite exacte : la variance implicite comme moyenne ponderee
+## 2. Ideee intuitive de Bergomi avant les formules
 
-### 2.1. Idee de couverture gamma/theta
+Bergomi compare **deux modeles**.
 
-Considerons :
+### 2.1. Pourquoi deux modeles ?
 
-- un **modele I** de reference, avec prix \(P_1(t,S)\), et volatilite instantanee \(\sigma_1(t,S)\) ;
-- un **modele II** "reel", sous lequel l'actif suit
+Parce qu'il veut mesurer le prix de l'erreur qu'on fait si :
+
+- on price/couvre l'option avec un **modele de base** ;
+- mais le sous-jacent evolue en realite selon un **autre modele**.
+
+Donc :
+
+- **modele I** = modele de reference, celui avec lequel on calcule le prix et les greeks ;
+- **modele II** = dynamique "reelle" suivie par le sous-jacent.
+
+Le grand message est :
+
+> la difference entre les deux prix est egale au P\&L cumule de la couverture delta faite avec le modele I alors que le sous-jacent suit le modele II.
+
+Cela peut sembler abstrait, mais c'est une idee de cours tres classique :
+
+- on evalue une strategie de couverture ;
+- on regarde combien elle gagne/perd si le monde reel ne suit pas le modele utilise.
+
+### 2.2. Pourquoi cela interesse l'implicite ?
+
+Parce qu'on va choisir le modele I de facon tres intelligente :
+
+- on le prend egal a Black-Scholes,
+- avec une volatilite constante choisie egale a **la volatilite implicite de l'option**.
+
+Dans ce cas :
+
+- le prix dans Black-Scholes est, par definition, egal au prix de l'option ;
+- donc la difference de prix entre modele I et modele II vaut zero ;
+- et cela force une relation entre :
+  - la volatilite implicite,
+  - et la volatilite instantanee du modele II.
+
+Si le modele II est ensuite le modele local vol, on obtient la formule centrale du chapitre.
+
+---
+
+## 3. Cadre mathematique precise
+
+On note :
+
+- \(P_1(t,S)\) : prix de l'option dans le **modele I** ;
+- \(P_2(t,S)\) : prix de l'option dans le **modele II** ;
+- \(f(S_T)\) : payoff europeen final.
+
+Dans le modele II, le sous-jacent suit :
 
 \[
 dS_t=(r-q)S_t\,dt+\sigma_{2,t}S_t\,dW_t.
 \]
 
-Ici \(\sigma_{2,t}\) peut etre un processus arbitraire.
+Pour le moment, \(\sigma_{2,t}\) est un processus quelconque.
 
-On considere une option europeenne de payoff \(f(S_T)\), maturity \(T\), et on regarde la quantite actualisee :
+On introduit la quantite actualisee :
 
 \[
 Q_t=e^{-rt}P_1(t,S_t).
 \]
 
-### 2.2. Application de la formule d'Itô
+Pourquoi cette quantite ?
 
-Sous le modele II, par Itô :
+Parce que :
+
+- en finance de prix, les quantites actualisees sont les bonnes quantites a etudier ;
+- elles permettent de faire apparaitre proprement le drift residuel ;
+- si le modele etait exactement bon, cette quantite se comporterait comme une martingale.
+
+---
+
+## 4. Derivation complete de la formule de Bergomi
+
+### 4.1. Application de la formule d'Itô a \(Q_t\)
+
+On applique Itô a \(P_1(t,S_t)\), puis on actualise :
 
 \[
 dQ_t
@@ -76,17 +227,17 @@ e^{-rt}
 +
 \partial_S P_1\,dS_t
 +
-\frac12 \partial_{SS}P_1\, d\langle S\rangle_t
+\frac12 \partial_{SS}P_1\,d\langle S\rangle_t
 \right].
 \]
 
-Or
+Or, dans le modele II :
 
 \[
 d\langle S\rangle_t=\sigma_{2,t}^2 S_t^2\,dt.
 \]
 
-Donc
+Donc :
 
 \[
 dQ_t
@@ -97,95 +248,168 @@ e^{-rt}
 +
 \partial_S P_1\,dS_t
 +
-\frac12 \sigma_{2,t}^2 S_t^2 \partial_{SS}P_1\,dt
+\frac12 \sigma_{2,t}^2 S_t^2\partial_{SS}P_1\,dt
 \right].
 \]
 
-Prenons maintenant l'esperance conditionnelle. Le terme en \(dW_t\) disparait et il reste :
+### 4.2. Esperance conditionnelle
+
+En prenant l'esperance conditionnelle, le terme brownien disparait.
+
+On obtient :
 
 \[
-\mathbb{E}_2[dQ_t\mid \mathcal{F}_t]
+\mathbb{E}_2[dQ_t\mid \mathcal F_t]
 =
 e^{-rt}
 \left[
--rP_1+\partial_t P_1
-+(r-q)S_t\partial_S P_1
-+\frac12 \sigma_{2,t}^2 S_t^2 \partial_{SS}P_1
+-rP_1+\partial_t P_1+(r-q)S_t\partial_S P_1+\frac12 \sigma_{2,t}^2 S_t^2\partial_{SS}P_1
 \right]dt.
 \]
 
-### 2.3. Utilisation de l'EDP du modele de reference
+### 4.3. Utilisation de l'EDP satisfaite par \(P_1\)
 
-Le prix \(P_1\) satisfait dans le modele I :
+Dans le modele I, \(P_1\) satisfait :
 
 \[
 \partial_t P_1+(r-q)S\partial_S P_1+\frac12 \sigma_1^2(t,S)S^2\partial_{SS}P_1-rP_1=0.
 \]
 
-En remplacant dans la formule precedente :
+Donc :
 
 \[
-\mathbb{E}_2[dQ_t\mid \mathcal{F}_t]
+-rP_1+\partial_t P_1+(r-q)S_t\partial_S P_1
 =
-e^{-rt}\frac12 S_t^2\partial_{SS}P_1(t,S_t)\left(\sigma_{2,t}^2-\sigma_1^2(t,S_t)\right)dt.
+-\frac12 \sigma_1^2(t,S_t)S_t^2\partial_{SS}P_1.
 \]
 
-En integrant entre \(0\) et \(T\), puis en prenant l'esperance :
+En remplacant :
+
+\[
+\mathbb{E}_2[dQ_t\mid \mathcal F_t]
+=
+e^{-rt}\frac12 S_t^2\partial_{SS}P_1(t,S_t)\big(\sigma_{2,t}^2-\sigma_1^2(t,S_t)\big)\,dt.
+\]
+
+### 4.4. Interpretation immediate : c'est le P\&L gamma/theta
+
+Cette formule est fondamentale.
+
+Elle dit que le drift residuel de la couverture delta est proportionnel a :
+
+\[
+\frac12 e^{-rt}S_t^2\Gamma_t\big(\sigma_{2,t}^2-\sigma_1^2(t,S_t)\big).
+\]
+
+Interpretation tres simple :
+
+- si la variance instantanee du vrai monde est la meme que celle du modele de couverture, alors ce terme vaut zero ;
+- sinon, il reste un ecart ;
+- cet ecart est pondere par le gamma.
+
+Autrement dit :
+
+> plus l'option est convexe, plus une erreur sur la variance instantanee coute cher en P\&L.
+
+### 4.5. Integration jusqu'a maturite
+
+On integre entre \(0\) et \(T\) :
 
 \[
 \mathbb{E}_2[Q_T]
 =
-Q_0
-+
+Q_0+
 \mathbb{E}_2\left[
-\int_0^T e^{-rt}\frac12 S_t^2\partial_{SS}P_1(t,S_t)
-\left(\sigma_{2,t}^2-\sigma_1^2(t,S_t)\right)dt
+\int_0^T e^{-rt}\frac12 S_t^2\partial_{SS}P_1(t,S_t)\big(\sigma_{2,t}^2-\sigma_1^2(t,S_t)\big)\,dt
 \right].
 \]
 
-Comme \(Q_T=e^{-rT}f(S_T)\), on obtient :
+Mais
 
 \[
-P_2(0,S_0,\cdot)
-=
-P_1(0,S_0)
-+
-\mathbb{E}_2\left[
-\int_0^T e^{-rt}\frac12 S_t^2\partial_{SS}P_1(t,S_t)
-\left(\sigma_{2,t}^2-\sigma_1^2(t,S_t)\right)dt
-\right].
+Q_T=e^{-rT}f(S_T),
 \]
 
-C'est la formule fondamentale de Bergomi : **le prix sous un modele II est egal au prix sous le modele I plus le P\&L moyen gamma/theta d'une couverture delta faite avec le modele I**.
+donc
 
-### 2.4. Cas particulier : le modele I est Black-Scholes
+\[
+\mathbb{E}_2[Q_T]=P_2(0,S_0,\cdot).
+\]
 
-On choisit maintenant comme modele I le modele Black-Scholes de volatilite **constante** egale a la volatilite implicite de l'option consideree :
+Et
+
+\[
+Q_0=P_1(0,S_0).
+\]
+
+Ainsi :
+
+\[
+\boxed{
+P_2(0,S_0,\cdot)
+=
+P_1(0,S_0)+
+\mathbb{E}_2\left[
+\int_0^T e^{-rt}\frac12 S_t^2\partial_{SS}P_1(t,S_t)\big(\sigma_{2,t}^2-\sigma_1^2(t,S_t)\big)\,dt
+\right].
+}
+\]
+
+### 4.6. Phrase simple a retenir
+
+Cette formule signifie :
+
+> Le prix dans le modele II = le prix dans le modele I + le P\&L moyen de la couverture delta calculee avec le modele I alors que le monde suit le modele II.
+
+Cette phrase est probablement la plus importante de toute la section 2.4.1.
+
+---
+
+## 5. Comment on obtient la "moyenne ponderee"
+
+### 5.1. Choix malin du modele I
+
+On prend maintenant le modele I comme etant Black-Scholes avec une volatilite constante egale a l'implicite de l'option :
 
 \[
 \sigma_1(t,S)\equiv \widehat{\sigma}_{K,T}.
 \]
 
-Par definition de la volatilite implicite :
+Par definition meme de l'implicite :
 
 \[
 P_1(0,S_0)=P_2(0,S_0,\cdot).
 \]
 
-La formule precedente donne alors :
+Donc le membre de gauche moins le premier terme du membre de droite vaut zero.
+
+Il reste :
 
 \[
-0
-=
+0=
 \mathbb{E}_2\left[
 \int_0^T e^{-rt}\frac12 S_t^2\Gamma_t^{BS}(\widehat{\sigma}_{K,T})
-\left(\sigma_{2,t}^2-\widehat{\sigma}_{K,T}^2\right)dt
+\big(\sigma_{2,t}^2-\widehat{\sigma}_{K,T}^2\big)\,dt
 \right].
 \]
 
-En reordonnant :
+En depliant :
 
 \[
+\widehat{\sigma}_{K,T}^2
+\mathbb{E}_2\left[
+\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}(\widehat{\sigma}_{K,T})\,dt
+\right]
+=
+\mathbb{E}_2\left[
+\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}(\widehat{\sigma}_{K,T})\,\sigma_{2,t}^2\,dt
+\right].
+\]
+
+Donc :
+
+\[
+\boxed{
 \widehat{\sigma}_{K,T}^{\,2}
 =
 \frac{
@@ -197,17 +421,41 @@ En reordonnant :
 \int_0^T e^{-rt}S_t^2\Gamma_t^{BS}(\widehat{\sigma}_{K,T})\,dt
 \right]
 }.
+}
 \]
 
-### 2.5. Cas du modele de volatilite locale
+### 5.2. Pourquoi c'est une moyenne ponderee ?
 
-Si le modele II est justement le modele local vol :
+Cette formule a exactement la forme :
+
+\[
+\frac{\mathbb E[\int w_t X_t\,dt]}{\mathbb E[\int w_t\,dt]},
+\]
+
+avec :
+
+- \(X_t=\sigma_{2,t}^2\),
+- \(w_t=e^{-rt}S_t^2\Gamma_t^{BS}(\widehat{\sigma}_{K,T})\).
+
+Donc \(\widehat{\sigma}_{K,T}^2\) est une **moyenne ponderee** de \(\sigma_{2,t}^2\).
+
+### 5.3. Pourquoi le poids est-il un dollar gamma ?
+
+Parce que :
+
+- le facteur \(S_t^2\Gamma_t\) apparait naturellement dans le terme de second ordre d'Itô ;
+- economiquement, c'est dans les zones ou l'option a beaucoup de convexite que l'erreur de volatilite coute le plus ;
+- donc ces zones doivent peser davantage dans la moyenne.
+
+### 5.4. Specialisation au modele local vol
+
+Si le modele II est le modele local vol, alors :
 
 \[
 \sigma_{2,t}=\sigma_{\mathrm{loc}}(t,S_t),
 \]
 
-alors
+et on obtient :
 
 \[
 \boxed{
@@ -215,8 +463,7 @@ alors
 =
 \frac{
 \mathbb{E}^{\mathrm{loc}}\left[
-\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}(\widehat{\sigma}_{K,T})
-\sigma_{\mathrm{loc}}^2(t,S_t)\,dt
+\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}(\widehat{\sigma}_{K,T})\,\sigma_{\mathrm{loc}}^2(t,S_t)\,dt
 \right]
 }{
 \mathbb{E}^{\mathrm{loc}}\left[
@@ -226,38 +473,380 @@ alors
 }
 \]
 
-### 2.6. Interpretation precise
+### 5.5. Point de comprehension crucial
 
-Cette identite dit que :
-
-- la **variance implicite** n'est pas arbitraire ;
-- elle est la **moyenne ponderee** de la **variance locale** ;
-- les poids sont les **dollar gammas actualises** du prix Black-Scholes, le long des trajectoires du modele local vol.
-
-### 2.7. Warning conceptuel important
-
-La formule exacte porte sur :
+**Exactement**, cette formule porte sur :
 
 \[
 \widehat{\sigma}_{K,T}^{\,2},
 \]
 
-et non directement sur \(\widehat{\sigma}_{K,T}\).
+pas sur \(\widehat{\sigma}_{K,T}\) lui-meme.
 
-Autrement dit :
+Donc :
 
-- **exactement** : c'est une moyenne de **variances locales** ;
-- **approximativement, a l'ordre 1** : on obtiendra une moyenne de **volatilites locales**.
+- formule exacte = moyenne de **variance locale** ;
+- formule approchee d'ordre 1 = moyenne de **volatilite locale**.
 
-Cette distinction est mathematiquement essentielle.
+Si tu confonds ces deux niveaux, tu perds le coeur de la section.
 
 ---
 
-## 3. Section 2.4.2 -- Approximation pour une local vol faiblement locale
+## 6. Pourquoi l'identite exacte ne suffit pas encore
 
-L'identite exacte precedente est implicite, car le membre de droite depend lui-meme de \(\widehat{\sigma}_{K,T}\).
+La formule exacte est tres belle, mais elle est **implicite**.
 
-Bergomi introduit alors une approximation de type perturbatif.
+Pourquoi ?
+
+Parce que \(\widehat{\sigma}_{K,T}\) apparait des deux cotes :
+
+- a gauche directement ;
+- a droite dans le gamma Black-Scholes ;
+- et aussi dans la loi induite, puisque les poids dependent de l'option consideree.
+
+Donc on ne peut pas "lire" directement \(\widehat{\sigma}_{K,T}\).
+
+C'est pour cela que Bergomi passe a une approximation perturbative.
+
+---
+
+## 7. Approximation "weakly local vol" : idee avant calcul
+
+### 7.1. Idee simple
+
+On suppose que la variance locale est proche d'une variance de reference deterministe :
+
+\[
+u(t,S)=\sigma_{\mathrm{loc}}^2(t,S)=u_0(t)+\delta u(t,S),
+\]
+
+ou \(\delta u\) est petit.
+
+Le sens de "weakly local" est donc :
+
+> la dependance en spot n'est pas trop forte ; on peut traiter cette dependance comme une perturbation.
+
+### 7.2. Pourquoi faire cela ?
+
+Parce que dans ce cas :
+
+- la loi de reference est connue explicitement ;
+- la gamma de reference est connue explicitement ;
+- on peut developper le rapport au premier ordre.
+
+### 7.3. Pourquoi la perturbation de la densite ne contribue pas a l'ordre 1 ?
+
+C'est souvent un point qui perturbe.
+
+Ecrivons symboliquement :
+
+\[
+\widehat{\sigma}^2=\frac{\mathbb E[(u_0+\delta u)\bullet]}{\mathbb E[\bullet]}.
+\]
+
+En developpant un quotient :
+
+\[
+\frac{A_0+\delta A}{B_0+\delta B}
+=
+\frac{A_0}{B_0}+\frac{\delta A\,B_0-A_0\,\delta B}{B_0^2}+O(\delta^2).
+\]
+
+Comme au point de base \(A_0=u_0 B_0\), la partie provenant de la perturbation de la loi se simplifie.
+
+Il reste seulement la contribution explicite de \(\delta u\).
+
+Le resultat est :
+
+\[
+\delta\!\left(\widehat{\sigma}_{K,T}^{\,2}\right)
+=
+\frac{
+\mathbb E_{\sigma_0}\left[
+\int_0^T e^{-rt}\delta u(t,S_t)S_t^2\Gamma_t^{(0)}\,dt
+\right]
+}{
+\mathbb E_{\sigma_0}\left[
+\int_0^T e^{-rt}S_t^2\Gamma_t^{(0)}\,dt
+\right]
+}.
+\]
+
+---
+
+## 8. Formule approchee exploitable
+
+En effectuant les calculs explicites sous Black-Scholes de reference, Bergomi obtient :
+
+\[
+\boxed{
+\widehat{\sigma}_{K,T}^{\,2}
+=
+\frac{1}{T}\int_0^T dt \int_{\mathbb R}\phi(y)\,
+u\!\left(
+t,\,
+F_t\exp\!\left(
+\frac{\omega_t}{\omega_T}x_K+\frac{\sqrt{(\omega_T-\omega_t)\omega_t}}{\sqrt{\omega_T}}\,y
+\right)
+\right),
+}
+\]
+
+ou :
+
+- \(u=\sigma_{\mathrm{loc}}^2\),
+- \(x_K=\ln(K/F_T)\),
+- \(\omega_t=\int_0^t \sigma_0^2(s)\,ds\),
+- \(\phi(y)=\dfrac{e^{-y^2/2}}{\sqrt{2\pi}}\).
+
+### Interpretation
+
+Cette formule dit :
+
+> la variance implicite approchee est une moyenne spatiale-temporelle de la variance locale, le long de trajectoires intermediaires reliees au point initial et au strike final.
+
+---
+
+## 9. Cas plus simple : developpement autour d'une vol constante
+
+Si \(\sigma_0(t)\equiv \sigma_0\) est constante, alors :
+
+\[
+\boxed{
+\widehat{\sigma}_{K,T}
+\approx
+\frac{1}{T}\int_0^T dt\int_{\mathbb R}\phi(y)\,
+\sigma_{\mathrm{loc}}\!\left(
+t,\,
+F_t\exp\!\left(
+\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
+\right)
+\right).
+}
+\]
+
+### Que signifie cette formule ?
+
+Elle est tres importante intuitivement :
+
+- on moyenne la local vol sur des points \((t,S)\) intermediaires ;
+- ces points joignent \(S_0\) au strike final \(K\) ;
+- \(y=0\) correspond au chemin central, ou "chemin le plus probable".
+
+Ce n'est pas encore parfait numeriquement, mais c'est extremement parlant pour comprendre la construction du smile.
+
+---
+
+## 10. Smile pres du forward
+
+Pres du forward, Bergomi pose :
+
+\[
+\sigma_{\mathrm{loc}}(t,S)=\overline{\sigma}(t)+\alpha(t)x+\frac{\beta(t)}{2}x^2,
+\qquad
+x=\ln(S/F_t).
+\]
+
+Interpretation :
+
+- \(\overline{\sigma}(t)\) = niveau instantane de vol locale ;
+- \(\alpha(t)\) = pente locale instantanee du smile local ;
+- \(\beta(t)\) = courbure locale instantanee.
+
+En reinjectant cette expansion dans la formule approchee, on obtient :
+
+\[
+\widehat{\sigma}_{K,T}
+\approx
+\frac{1}{T}\int_0^T \overline{\sigma}(t)\,dt
++
+\left(\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt\right)x_K
++
+\frac12\left(\frac{1}{T}\int_0^T \left(\frac{t}{T}\right)^2\beta(t)\,dt\right)x_K^2
+\]
+
+a un terme de niveau pres.
+
+Donc :
+
+\[
+\boxed{
+\left.\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt
+}
+\]
+
+et
+
+\[
+\boxed{
+\left.\frac{\partial^2 \widehat{\sigma}_{K,T}}{\partial (\ln K)^2}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \left(\frac{t}{T}\right)^2\beta(t)\,dt.
+}
+\]
+
+### Idee centrale
+
+Le skew implicite pres du forward est une **moyenne ponderee** du skew local \(\alpha(t)\).
+
+Pourquoi le poids \(t/T\) ?
+
+Parce que plus on est proche de l'echeance, plus la contrainte terminale \(S_T\approx K\) est forte.
+
+Cas particulier :
+
+si \(\alpha(t)\equiv \alpha\), alors
+
+\[
+\left.\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+=\frac{\alpha}{2}.
+\]
+
+Donc le skew implicite ATMF vaut la moitie du skew local constant.
+
+---
+
+## 11. Loi de puissance pour le skew
+
+Supposons
+
+\[
+\alpha(t)=
+\begin{cases}
+\alpha_0, & t\le \tau_0,\\
+\alpha_0(\tau_0/t)^\gamma, & t>\tau_0.
+\end{cases}
+\]
+
+Alors a grande maturite :
+
+\[
+\left.\frac{\partial \widehat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+\sim
+\frac{1}{2-\gamma}\alpha_0\left(\frac{\tau_0}{T}\right)^\gamma.
+\]
+
+Donc :
+
+- le skew implicite decroit avec le meme exposant \(\gamma\) que le skew local ;
+- \(\alpha(t)\) controle directement la structure par terme du skew implicite.
+
+---
+
+## 12. Resultat exact de courte maturite
+
+Ici, Bergomi ne fait plus une approximation perturbative.
+
+Quand \(T\to 0\), il obtient un resultat exact :
+
+\[
+\boxed{
+\frac{1}{\widehat{\sigma}(0,K)}
+=
+\frac{1}{\ln(K/S_0)}
+\int_{S_0}^{K}\frac{dS}{S\,\sigma_{\mathrm{loc}}(0,S)}.
+}
+\]
+
+### Pourquoi ce resultat surprend ?
+
+Parce qu'on pourrait s'attendre a voir apparaitre :
+
+- une moyenne de \(\sigma\),
+- ou une moyenne de \(\sigma^2\).
+
+Mais non.
+
+Ici, c'est une **moyenne harmonique** de \(1/\sigma_{\mathrm{loc}}\).
+
+### Intuition
+
+A tres courte maturite :
+
+- il n'y a presque plus de moyenne temporelle ;
+- ce qui compte, c'est la geometrie spatiale entre \(S_0\) et \(K\).
+
+Si la vol locale s'annule sur une region a franchir, alors le spot ne peut pratiquement pas traverser cette region instantanement ; il est donc logique que l'implicite associee tende aussi vers zero.
+
+La moyenne harmonique respecte exactement cette intuition.
+
+---
+
+## 13. Lien avec Dupire
+
+### 13.1. Sens direct de Dupire
+
+Dupire dit :
+
+\[
+\sigma_{\mathrm{loc}}^2(T,K)
+=
+\frac{\partial_T C(T,K)+(r-q)K\partial_K C(T,K)+qC(T,K)}
+{\frac12 K^2\partial_{KK}C(T,K)}.
+\]
+
+Donc, connaissant la surface des calls, on reconstruit la local vol.
+
+### 13.2. Sens inverse dans Bergomi
+
+Le chapitre 2.4 etudie l'autre sens :
+
+- la local vol est supposee donnee ;
+- on cherche la surface implicite qu'elle engendre.
+
+### 13.3. Message conceptuel
+
+Dupire repond a une question de **calibration statique**.
+
+Bergomi pose ensuite la vraie question de **dynamique** :
+
+> une fois ce modele local vol calibre aujourd'hui, comment la surface implicite bougera-t-elle demain ?
+
+---
+
+## 14. Limites du modele local vol et de l'approximation
+
+### 14.1. Limite de l'ordre 1
+
+Les formules approchees sont excellentes pour :
+
+- l'intuition ;
+- le skew ;
+- la courbure ;
+- les asymptotiques.
+
+Mais elles ne sont pas assez precises pour des niveaux absolus de smile equity realistes.
+
+### 14.2. Limite du modele local vol lui-meme
+
+Un modele local vol peut calibrer exactement les vanilles a \(t=0\), mais produire une mauvaise dynamique du smile.
+
+En pratique :
+
+- le smile local vol est souvent trop rigide ;
+- les modeles de volatilite stochastique reproduisent mieux la dynamique observee.
+
+---
+
+## 15. Ce qu'il faut retenir absolument
+
+1. Le point de depart de Bergomi est un **argument de couverture delta**.
+2. Le **P\&L residuel** est gouverne par un terme de type gamma/theta.
+3. Cela donne une formule exacte ou la **variance implicite** est une **moyenne ponderee de variances locales**.
+4. En regime **weakly local vol**, on obtient une formule exploitable pour l'implicite elle-meme.
+5. Pres du forward, le smile implicite est controle par \(\alpha(t)\) et \(\beta(t)\).
+6. A courte maturite, on obtient un resultat exact en **moyenne harmonique**.
+7. Le sens profond du chapitre est : **calibrer une surface n'est pas comprendre sa dynamique**.
+
+---
+
+## 16. En une phrase simple pour toi
+
+Si tu veux une version ultra simple :
+
+> Bergomi montre que, dans un modele local vol, la volatilite implicite n'est pas une quantite mysterieuse : elle s'obtient en moyennant la volatilite locale de facon tres precise, avec des poids qui viennent du gamma de l'option ; ensuite, pres du forward, tout le smile est pilote par la pente locale \(\alpha(t)\).
 
 ### 3.1. Decomposition de la variance locale
 
