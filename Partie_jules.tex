@@ -1,3 +1,4 @@
+\section{Passage de la volatilité locale à la volatilité implicite}
 \begin{frame}{Du local vol vers l'implicite : la question}
 \small
 \begin{itemize}
@@ -126,79 +127,6 @@ X(t,y)=\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Mouvement du smile quand le spot bouge}
-\small
-Pour un \textbf{strike fixe} \(K\), on derive la formule precedente par rapport a \(\ln S_0\) :
-\[
-\left.
-\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln S_0}
-\right|_{K=F_T}
-=
-\frac{1}{T}\int_0^T
-\left(1-\frac{t}{T}\right)\alpha(t)\,dt.
-\]
-
-\begin{itemize}
-    \item Ici le poids est \(1-t/T\), donc \textbf{les temps courts dominent}.
-    \item Intuition : un choc de spot agit surtout au debut de la trajectoire, avant que la contrainte terminale \(K\) ne prenne le dessus.
-\end{itemize}
-
-\[
-\frac{t}{T}
-\quad \text{pour le skew strike}
-\qquad\text{vs}\qquad
-1-\frac{t}{T}
-\quad \text{pour le spot a strike fixe.}
-\]
-\end{frame}
-
-\begin{frame}{Dynamique ATMF et role central de \texorpdfstring{$\alpha(t)$}{alpha(t)}}
-\small
-Comme \(K=F_T(S_0)\) pour l'ATMF,
-\[
-\frac{d\hat{\sigma}_{F_T,T}}{d\ln S_0}
-=
-\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln S_0}\right|_{K=F_T}
-\;+\;
-\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
-=
-\frac{1}{T}\int_0^T \alpha(t)\,dt.
-\]
-
-\begin{itemize}
-    \item Cette fois, \textbf{toutes les dates comptent avec le meme poids}.
-    \item La dynamique de la vol ATMF est entierement determinee par la structure par terme du skew local \(\alpha(t)\).
-\end{itemize}
-
-\begin{block}{Point cle}
-Le mouvement de la vol ATMF sous local vol n'est pas libre : il est impose par la courbe \(t\mapsto \alpha(t)\).
-\end{block}
-\end{frame}
-
-\begin{frame}{Le ratio \texorpdfstring{$R_T$}{R_T} : rigidite du skew}
-\small
-\[
-R_T
-:=
-\frac{
-\dfrac{d\hat{\sigma}_{F_T,T}}{d\ln S_0}
-}{
-\left.\dfrac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
-}
-=
-\frac{\int_0^T \alpha(t)\,dt}{\int_0^T \frac{t}{T}\alpha(t)\,dt}.
-\]
-
-\begin{itemize}
-    \item \textbf{Sticky-delta :} \(R_T=0\) (la vol ATMF ne bouge pas quand le spot bouge).
-    \item \textbf{Sticky-strike :} \(R_T=1\) (les vols a strike fixe restent invariantes).
-    \item \textbf{Local vol, skew local constant :} \(R_T=2\).
-\end{itemize}
-
-\begin{block}{Interpretation}
-Sous local vol, le smile est en general \textbf{trop rigide} : l'ATMF reagit plus qu'en sticky-strike et beaucoup plus qu'en sticky-delta.
-\end{block}
-\end{frame}
 
 \begin{frame}{Structure par terme du skew : loi de puissance}
 \small
@@ -247,7 +175,7 @@ Quand \(T\to 0\), on a un resultat exact :
     \item \textbf{Lien avec Dupire :} Dupire donne \(\sigma_{\mathrm{loc}}\) a partir du smile ; ici on etudie le \emph{retour} de \(\sigma_{\mathrm{loc}}\) vers \(\hat{\sigma}\).
     \item \textbf{Forces :} les formules d'ordre 1 expliquent bien skew, courbure, dynamique ATMF, et le role de \(\alpha(t)\).
     \item \textbf{Limite majeure :} pour les smiles equity realistes, l'approximation faible-local-vol est insuffisante pour les niveaux absolus.
-    \item \textbf{Par rapport a la stoch vol :} la dynamique du smile est trop contrainte sous local vol ; en pratique, les modeles stochastiques donnent souvent des mouvements plus proches de sticky-delta.
+
 \end{itemize}
 
 \vspace{0.2cm}
