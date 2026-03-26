@@ -1,46 +1,57 @@
-# Questions probables a l'oral — Bergomi 2.4 a 2.4.6
+# Questions probables a l'oral -- strictement dans le perimetre des slides
 
-Ce document est different de `questions_reponses_bergomi_2_4.md`.
+Ce document est volontairement **resserre** :
 
-- Le fichier precedent est une **banque large de questions-reponses**.
-- Ici, l'objectif est de te preparer a **ce qu'un enseignant peut te demander a l'oral**, avec :
-  - une formulation plausible de la question ;
-  - une reponse detaillee mais parlable ;
-  - ce qu'il faut absolument dire ;
-  - le risque classique a eviter.
+- il suit le **meme perimetre** que les slides actuels ;
+- il ne developpe **pas** les parties retirees du support oral ;
+- il sert a preparer les **questions les plus probables du jury** sur ce que tu presentes reellement.
 
-Le niveau vise est : **M2 Probabilites & Finance / finance quantitative**, avec articulation entre **Bergomi** et **le cours**.
+Le contenu suit donc uniquement :
+
+1. local vol \(\to\) implicite : idee du chapitre ;
+2. identite exacte de moyenne ponderee ;
+3. approximation weak local vol ;
+4. parametrisation locale pres du forward ;
+5. skew et courbure implicites ;
+6. loi de puissance pour \(\alpha(t)\) ;
+7. resultat exact a courte maturite ;
+8. liens Dupire / stoch vol / limites.
 
 ---
 
-## 1) "Quel est exactement l'objectif de cette section 2.4 ?"
+## 1) "Quel est l'objectif exact de cette section ?"
 
 ### Reponse detaillee
 
-L'objectif de la section 2.4 est d'etudier le probleme inverse de Dupire.
+L'objectif est de comprendre comment une fonction de volatilite locale
+\[
+\sigma_{\mathrm{loc}}(t,S)
+\]
+engendre une surface de volatilite implicite
+\[
+\hat{\sigma}(K,T).
+\]
 
-Habituellement, on part de la surface de volatilite implicite de marche et, via la formule de Dupire, on reconstruit une fonction de volatilite locale \(\sigma_{\mathrm{loc}}(t,S)\).  
-Ici, Bergomi suppose au contraire que la fonction de volatilite locale est donnee, et il cherche a comprendre :
+Dupire fait le chemin implicite \(\to\) local vol.  
+Ici, Bergomi fait le chemin inverse :
+\[
+\sigma_{\mathrm{loc}}(t,S)\longrightarrow \hat{\sigma}(K,T).
+\]
 
-1. quelle surface implicite cette fonction engendre ;
-2. comment cette surface implicite reagit quand le spot bouge ;
-3. pourquoi les dynamiques de smile produites par local vol sont structurellement contraintes.
-
-Le point fort de la section est qu'elle ne s'arrete pas a une relation statique entre local vol et implicite : elle explique aussi la **dynamique du smile**.
+Le point central est que l'implicite n'est pas une simple "lecture ponctuelle" de la local vol ; elle resulte d'une forme d'averaging de la volatilite locale.
 
 ### A dire absolument
 
 - "C'est le probleme inverse de Dupire."
-- "Le vrai enjeu est la dynamique du smile, pas seulement le calibrage statique."
+- "On cherche a interpreter mathematiquement la volatilite implicite produite par un modele local vol."
 
 ### Piege a eviter
 
-Ne pas dire seulement : "on exprime l'implicite en fonction de la local vol".  
-Ce serait vrai, mais incomplet. Il faut mentionner **la dynamique induite**.
+Ne pas partir directement sur le skew sans avoir d'abord dit ce que cherche la section dans son ensemble.
 
 ---
 
-## 2) "Quelle est l'identite fondamentale de la section ?"
+## 2) "Quelle est l'identite fondamentale ?"
 
 ### Reponse detaillee
 
@@ -64,532 +75,368 @@ L'identite fondamentale est :
 
 Elle dit que la **variance implicite** est une **moyenne ponderee** de la **variance locale**.
 
-Le poids est le dollar gamma actualise de l'option dans le modele de base Black-Scholes, pris le long des trajectoires du modele local vol.
-
-Ce resultat est exact, mais il reste implicite puisque \(\hat{\sigma}_{K,T}\) apparait aussi dans les poids.
+Le poids est un poids de type dollar gamma :
+\[
+w_t=e^{-rt}S_t^2\Gamma_t^{BS}.
+\]
 
 ### A dire absolument
 
-- "La formule exacte porte sur \(\hat{\sigma}^2\), pas directement sur \(\hat{\sigma}\)."
-- "Les poids sont de type dollar gamma."
+- "La formule exacte porte sur \(\hat{\sigma}^2\)."
+- "Les poids sont des dollar gammas actualises."
 
 ### Piege a eviter
 
-Ne pas dire : "l'implicite est la moyenne de la local vol".  
-**Exactement**, c'est la variance implicite qui est moyenne de **variance locale**.
+Ne pas dire : "l'implicite est exactement la moyenne de la local vol".  
+Exactement, c'est la **variance implicite** qui moyenne la **variance locale**.
 
 ---
 
-## 3) "D'ou vient cette identite ?"
+## 3) "Pourquoi parle-t-on de moyenne ponderee ?"
 
 ### Reponse detaillee
 
-Elle vient d'un argument de couverture delta.
-
-On choisit un modele de base \(P_1\), puis on regarde ce qui se passe si la vraie dynamique du sous-jacent suit un autre modele. En appliquant Itô a
+Parce que la formule s'ecrit sous la forme
 \[
-Q_t=e^{-rt}P_1(t,S_t),
-\]
-on obtient que la derivee de \(Q_t\) depend d'un terme proportionnel a
-\[
-\frac12 e^{-rt}S_t^2\Gamma_t\big(\sigma_{\text{vraie}}^2-\sigma_{\text{base}}^2\big).
+\hat{\sigma}^2
+=
+\frac{\mathbb E\left[\int_0^T w_t\,\sigma_{\mathrm{loc}}^2(t,S_t)\,dt\right]}
+{\mathbb E\left[\int_0^T w_t\,dt\right]}.
 \]
 
-En integrant ce P\&L gamma/theta et en prenant l'esperance, on obtient la difference de prix entre les deux modeles.
+On voit donc :
 
-Ensuite, si le modele de base est Black-Scholes avec volatilite egale a la volatilite implicite de l'option, alors les deux prix coïncident au temps 0, ce qui permet d'isoler \(\hat{\sigma}_{K,T}^2\).
+- un **numerateur** = somme ponderee des variances locales ;
+- un **denominateur** = somme totale des poids ;
+- donc une **moyenne**.
+
+Les zones ou l'option a un gamma fort comptent davantage.
 
 ### A dire absolument
 
-- "C'est un argument de P\&L de couverture delta."
-- "Le terme cle est le gamma/theta."
+- "Toutes les dates et tous les etats ne comptent pas pareil."
+- "Le gamma determine l'importance relative de chaque contribution."
 
 ### Piege a eviter
 
-Ne pas parler d'une simple "astuce de calcul".  
-C'est une **identite de pricing** obtenue via une couverture.
+Ne pas parler d'une moyenne uniforme dans le temps.
 
 ---
 
-## 4) "Pourquoi le gamma apparait-il naturellement ?"
+## 4) "Pourquoi le gamma apparait-il dans les poids ?"
 
 ### Reponse detaillee
 
-Le gamma apparait parce que l'erreur de modelisation de la volatilite ne se voit pas au premier ordre en \(dS_t\), mais au second ordre.
+Il apparait parce que la derivation de Bergomi repose sur un P&L de couverture delta.
 
-Quand on couvre delta, le risque lineaire en \(dS_t\) est neutralise. Ce qui reste vient du terme quadratique de la formule d'Itô :
+Quand on couvre delta, on neutralise le terme lineaire en \(dS_t\).  
+Ce qui reste vient du terme quadratique de la formule d'Itô :
 \[
-\frac12 \partial_{SS}P\, d\langle S\rangle_t.
+\frac12 \partial_{SS}P\,d\langle S\rangle_t.
 \]
 
 Comme
 \[
-d\langle S\rangle_t=\sigma_t^2 S_t^2 dt,
+d\langle S\rangle_t=\sigma_t^2 S_t^2dt,
 \]
-on obtient naturellement un terme en
+on obtient naturellement le facteur
 \[
 S_t^2\Gamma_t.
 \]
 
-C'est donc la sensibilité de second ordre de l'option qui mesure l'impact d'un mauvais modele de volatilite instantanee.
-
 ### A dire absolument
 
 - "Le delta neutralise le premier ordre."
-- "Le mauvais choix de volatilite se voit dans le second ordre."
+- "L'erreur de volatilite apparait au second ordre, donc via le gamma."
 
 ### Piege a eviter
 
-Ne pas confondre gamma et vega ici.  
-La derivation de Bergomi passe d'abord par **le gamma/theta**, pas par un raisonnement de vega.
+Ne pas confondre gamma et vega.
 
 ---
 
-## 5) "Quel est le lien avec le cours sur Itô et Feynman-Kac ?"
+## 5) "Pourquoi l'identite exacte ne donne-t-elle pas directement une formule simple de \(\hat{\sigma}\) ?"
 
 ### Reponse detaillee
 
-Le lien est direct.
+Parce que la formule est **implicite**.
 
-1. **Itô** est utilise pour calculer la dynamique de \(e^{-rt}P(t,S_t)\).
-2. **L'EDP de pricing** du modele de base permet de simplifier les termes de drift.
-3. **Feynman-Kac** justifie que la solution de l'EDP coincide avec l'esperance risque-neutre du payoff.
+La quantite \(\hat{\sigma}_{K,T}\) apparait deja dans le membre de droite, a travers :
 
-Donc cette section est en fait une application tres naturelle du triptyque de cours :
+- le gamma Black-Scholes ;
+- la loi utilisee dans l'esperance.
 
-- dynamique du sous-jacent ;
-- formule d'Itô ;
-- EDP de pricing / Feynman-Kac.
+Donc la formule est mathematiquement tres importante, mais pas encore directement exploitable pour obtenir une expression fermee.
 
 ### A dire absolument
 
-- "Bergomi reutilise exactement les outils centraux du cours."
+- "La formule exacte est conceptuelle, mais implicite."
 
 ### Piege a eviter
 
-Ne pas presenter la section comme purement "heuristique de praticien".  
-Elle repose sur une base mathematique standard du cours.
+Ne pas dire qu'elle est inutile ; elle sert de point de depart a l'approximation weak local vol.
 
 ---
 
-## 6) "Pourquoi l'identite exacte n'est-elle pas suffisante en pratique ?"
+## 6) "Que veut dire weak local vol ?"
 
 ### Reponse detaillee
 
-Parce qu'elle est **implicite**.
-
-Le membre de droite depend lui-meme de \(\hat{\sigma}_{K,T}\), a travers le gamma Black-Scholes et le poids de l'averaging. Donc on n'obtient pas directement une formule fermee de l'implicite.
-
-En plus, numeriquement, la dependance de la densite a la local vol est importante. Or une approximation trop naive peut mal capturer cette dependance, surtout sur les smiles equity qui sont assez marques.
-
-Donc en pratique, la formule exacte est surtout utile pour :
-
-- comprendre la structure du probleme ;
-- construire des approximations analytiques ;
-- interpreter la dynamique du smile.
-
-### A dire absolument
-
-- "La formule est exacte mais implicite."
-- "Le vrai probleme pratique est la dependance de la densite a \(\sigma_{\mathrm{loc}}\)."
-
-### Piege a eviter
-
-Ne pas dire que la formule exacte est "inutilisable".  
-Elle est tres utile conceptuellement, mais pas suffisante pour du pricing numerique precis.
-
----
-
-## 7) "Que veut dire 'weakly local vol' ?"
-
-### Reponse detaillee
-
-Cela signifie que la dependance en spot de la volatilite locale est **faible**, au sens ou on peut ecrire
+On suppose que la dependance en spot de la local vol est faible, par exemple
 \[
 \sigma_{\mathrm{loc}}(t,S)=\sigma_0+\delta\sigma(t,S),
 \]
-avec \(\delta\sigma\) petit, ou bien au niveau variance
-\[
-u(t,S)=u_0(t)+\delta u(t,S).
-\]
+avec \(\delta\sigma\) petit.
 
-On fait alors un developpement perturbatif au premier ordre en \(\delta\sigma\) ou \(\delta u\).  
-L'idee est de geler la densite dans un modele de reference simple, en general Black-Scholes, pour obtenir une formule analytique exploitable.
+On effectue alors un developpement perturbatif d'ordre 1 autour d'un modele de reference simple.
 
 ### A dire absolument
 
 - "C'est un developpement perturbatif."
-- "On linearise autour d'un modele de reference."
+- "On linearise autour d'une volatilite de reference."
 
 ### Piege a eviter
 
-Ne pas dire que cela signifie "la volatilite locale est presque constante dans le temps".  
-Le point important est surtout la **faible dependance en spot**.
+Ne pas dire que cela signifie seulement "volatilite presque constante en temps".  
+Le point essentiel est la faible dependance en **spot**.
 
 ---
 
-## 8) "Quelle est la formule approchée principale obtenue ?"
+## 7) "Quelle est la formule approchee principale obtenue ?"
 
 ### Reponse detaillee
 
-Au premier ordre autour d'une volatilite constante \(\sigma_0\), Bergomi obtient :
+On obtient :
 \[
 \hat{\sigma}_{K,T}
 \approx
-\frac1T\int_0^Tdt\int_{\mathbb R}\phi(y)\,
+\frac{1}{T}
+\int_0^T\!\!dt
+\int_{\mathbb R}\phi(y)\,
 \sigma_{\mathrm{loc}}\!\left(
 t,\,
-F_t\exp\!\left(\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y\right)
+F_t\exp\!\Big(
+\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
+\Big)
 \right)dy.
 \]
 
-Cette formule donne une interpretation geometrique tres forte :
-
-- on moyenne la local vol sur des niveaux intermediaires \(S(t,y)\) ;
-- ces niveaux joignent \(S_0\) au strike \(K\) ;
-- la variable \(y\) correspond a une dispersion gaussienne autour du chemin central.
-
-### A dire absolument
-
-- "C'est une moyenne gaussienne de la local vol."
-- "Le chemin central relie \(S_0\) a \(K\) en log-espace."
-
-### Piege a eviter
-
-Ne pas oublier de preciser qu'il s'agit d'une formule **d'ordre 1**.
-
----
-
-## 9) "Comment interpretez-vous le chemin \(y=0\) ?"
-
-### Reponse detaillee
-
-Le chemin \(y=0\) est le chemin central, souvent interprete comme le **chemin le plus probable** dans cette approximation.
-
-Si on ne garde que \(y=0\), on obtient une formule encore plus simple :
+avec
 \[
-\hat{\sigma}_{K,T}\approx \frac1T\int_0^T
-\sigma_{\mathrm{loc}}\!\left(t,F_t e^{(t/T)x_K}\right)\,dt.
+x_K=\ln\!\left(\frac{K}{F_T}\right),
+\qquad
+\phi(y)=\frac{e^{-y^2/2}}{\sqrt{2\pi}}.
 \]
 
-Cette approximation est trop crude pour du calcul precis, mais elle est excellente pour l'intuition :
-
-- l'implicite regarde essentiellement ce qui se passe le long d'une trajectoire qui part de \(S_0\) et finit en \(K\) ;
-- ce n'est donc jamais une simple evaluation ponctuelle de \(\sigma_{\mathrm{loc}}\).
+Cette formule donne une interpretation geometrique : l'implicite est une moyenne gaussienne de la local vol sur des trajectoires intermediaires.
 
 ### A dire absolument
 
-- "Le chemin \(y=0\) donne une intuition, pas une formule numeriquement fiable."
+- "La formule approchee porte cette fois sur \(\hat{\sigma}\), pas sur \(\hat{\sigma}^2\)."
+- "Il s'agit d'une formule d'ordre 1."
 
 ### Piege a eviter
 
-Ne pas presenter le chemin \(y=0\) comme un resultat exact.
+Ne pas oublier de dire que cette formule est **approchee**.
 
 ---
 
-## 10) "Pourquoi developper la local vol autour du forward ?"
+## 8) "Quel est le sens de la variable \(y\) ?"
 
 ### Reponse detaillee
 
-Parce que la zone la plus importante pour le smile est souvent le voisinage du **forward ATMF**.
+\(y\) est une variable gaussienne standard qui parametre les deviations autour d'un chemin central.
 
-On ecrit alors
+Le terme
+\[
+F_t\exp\!\Big(
+\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
+\Big)
+\]
+represente les niveaux intermediaires de spot explores dans l'approximation.
+
+### A dire absolument
+
+- "Le terme en \(y\) represente la dispersion autour d'un chemin central."
+
+### Piege a eviter
+
+Ne pas dire que \(y\) est un "nouveau spot" ; c'est un parametre gaussien d'integration.
+
+---
+
+## 9) "Pourquoi le chemin \(y=0\) est-il important ?"
+
+### Reponse detaillee
+
+Parce qu'il correspond au chemin central, souvent interprete comme le chemin le plus probable dans cette approximation.
+
+Si on ne garde que \(y=0\), on voit l'implicite comme une moyenne de la local vol le long d'une trajectoire simple reliant \(S_0\) au strike final.
+
+### A dire absolument
+
+- "Le chemin \(y=0\) donne une bonne intuition geometrique."
+
+### Piege a eviter
+
+Ne pas dire que cette reduction est exacte : ce n'est qu'une lecture intuitive.
+
+---
+
+## 10) "Pourquoi developper la local vol pres du forward ?"
+
+### Reponse detaillee
+
+Parce qu'on s'interesse au smile pres du point le plus naturel pour les vanilles, le forward ATMF.
+
+On ecrit :
 \[
 \sigma_{\mathrm{loc}}(t,S)=\bar{\sigma}(t)+\alpha(t)x+\frac{\beta(t)}{2}x^2,
-\qquad x=\ln(S/F_t).
-\]
-
-Ce developpement permet de lire directement :
-
-- le niveau local via \(\bar{\sigma}(t)\) ;
-- le skew local via \(\alpha(t)\) ;
-- la courbure locale via \(\beta(t)\).
-
-Ensuite, en injectant cela dans la formule approchée, on obtient des expressions analytiques du skew implicite et de la courbure implicite.
-
-### A dire absolument
-
-- "On se place autour du forward car c'est le point naturel pour le smile ATMF."
-
-### Piege a eviter
-
-Ne pas oublier que c'est un developpement **local** : il ne decrit pas tout le smile loin du money.
-
----
-
-## 11) "Quel est le resultat fondamental sur le skew implicite ?"
-
-### Reponse detaillee
-
-Le resultat fondamental est :
-\[
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial\ln K}\right|_{K=F_T}
-=
-\frac1T\int_0^T\frac{t}{T}\alpha(t)\,dt.
-\]
-
-Cela signifie que le skew implicite ATMF est une **moyenne ponderee** du skew local instantane \(\alpha(t)\).
-
-Le poids est \(t/T\), donc les instants proches de l'echeance comptent davantage.
-
-Si \(\alpha(t)\) est constant, on retrouve :
-\[
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial\ln K}\right|_{K=F_T}=\frac{\alpha}{2}.
-\]
-
-### A dire absolument
-
-- "Le skew implicite ne reproduit pas le skew local point par point."
-- "Il en prend une moyenne temporelle ponderee."
-
-### Piege a eviter
-
-Ne pas dire que le poids est uniforme.
-
----
-
-## 12) "Pourquoi le poids est-il \(t/T\) ?"
-
-### Reponse detaillee
-
-Parce qu'une variation du strike final ne contraint pas la trajectoire de la meme facon a toutes les dates.
-
-- Au debut de la vie de l'option, la contrainte terminale \(K\) est encore lointaine.
-- A mesure qu'on se rapproche de \(T\), cette contrainte devient plus forte.
-
-Le facteur \(t/T\) traduit exactement cette influence croissante du strike terminal au cours du temps.
-
-### A dire absolument
-
-- "Le strike se fait sentir de plus en plus a mesure qu'on approche de l'echeance."
-
-### Piege a eviter
-
-Ne pas donner une justification purement algebrique ; l'intuition temporelle est importante a l'oral.
-
----
-
-## 13) "Quel est le resultat sur la reaction du smile a un mouvement du spot ?"
-
-### Reponse detaillee
-
-Pour un strike fixe, Bergomi obtient :
-\[
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial\ln S_0}\right|_{K=F_T}
-=
-\frac1T\int_0^T\left(1-\frac{t}{T}\right)\alpha(t)\,dt.
-\]
-
-Cette fois, le poids est \(1-t/T\), donc ce sont les temps courts qui dominent.
-
-L'interpretation est naturelle : un choc de spot agit d'abord au debut de la trajectoire, avant que la contrainte terminale du strike ne prenne le dessus.
-
-### A dire absolument
-
-- "Le poids complementaire \(1-t/T\) s'oppose au poids \(t/T\) du skew en strike."
-
-### Piege a eviter
-
-Ne pas confondre cette quantite avec la dynamique ATMF.
-
----
-
-## 14) "Comment obtient-on la dynamique de la vol ATMF ?"
-
-### Reponse detaillee
-
-Il faut utiliser la regle de chaine, car le strike ATMF depend lui-meme du spot :
-\[
-K=F_T(S_0).
-\]
-
-Donc
-\[
-\frac{d\hat{\sigma}_{F_T,T}}{d\ln S_0}
-=
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial\ln S_0}\right|_{K=F_T}
-+
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial\ln K}\right|_{K=F_T}.
-\]
-
-En remplaçant les deux formules precedentes, on obtient :
-\[
-\frac{d\hat{\sigma}_{F_T,T}}{d\ln S_0}
-=
-\frac1T\int_0^T\alpha(t)\,dt.
-\]
-
-Donc la dynamique de la vol ATMF est gouvernee par la **moyenne temporelle uniforme** du skew local.
-
-### A dire absolument
-
-- "Pour l'ATMF, toutes les dates comptent avec le meme poids."
-
-### Piege a eviter
-
-Ne pas oublier le terme venant de la dependance de \(K\) en \(S_0\).
-
----
-
-## 15) "Pourquoi dit-on que \(\alpha(t)\) est le parametre central ?"
-
-### Reponse detaillee
-
-Parce que \(\alpha(t)\) gouverne simultanement :
-
-1. le skew implicite ATMF :
-   \[
-   \left.\partial_{\ln K}\hat{\sigma}\right|_{ATMF};
-   \]
-2. la reaction a spot fixe :
-   \[
-   \left.\partial_{\ln S_0}\hat{\sigma}\right|_{ATMF};
-   \]
-3. la dynamique de la vol ATMF :
-   \[
-   \frac{d\hat{\sigma}_{F_T,T}}{d\ln S_0};
-   \]
-4. le ratio \(R_T\).
-
-Autrement dit, la structure par terme du skew local impose la structure par terme de la dynamique du smile implicite.
-
-### A dire absolument
-
-- "Toute la dynamique de smile passe essentiellement par \(\alpha(t)\)."
-
-### Piege a eviter
-
-Ne pas sur-vendre \(\beta(t)\) : il joue surtout sur la courbure, pas sur la dynamique principale ATMF.
-
----
-
-## 16) "Comment definir \(R_T\) et comment l'interpreter ?"
-
-### Reponse detaillee
-
-On definit
-\[
-R_T=
-\frac{
-\dfrac{d\hat{\sigma}_{F_T,T}}{d\ln S_0}
-}{
-\left.\dfrac{\partial\hat{\sigma}_{K,T}}{\partial\ln K}\right|_{K=F_T}
-}.
-\]
-
-Il mesure de combien la vol ATMF bouge, **exprimee en unites de skew ATMF**.
-
-Si on remplace par les formules precedentes :
-\[
-R_T=
-\frac{\int_0^T \alpha(t)\,dt}
-{\int_0^T \frac{t}{T}\alpha(t)\,dt}.
-\]
-
-Donc \(R_T\) quantifie la **rigidite du smile**.
-
-### A dire absolument
-
-- "C'est une mesure de smile dynamics."
-- "Il compare mouvement de l'ATMF et pente du smile."
-
-### Piege a eviter
-
-Ne pas donner seulement la formule : il faut dire ce qu'elle mesure.
-
----
-
-## 17) "Que signifient sticky-strike et sticky-delta dans ce cadre ?"
-
-### Reponse detaillee
-
-- **Sticky-strike** : les volatilites implicites a strike absolu fixe ne bougent pas quand le spot bouge.  
-  Dans ce cas, la vol ATMF se deplace exactement du montant donne par la pente du smile, donc \(R_T=1\).
-
-- **Sticky-delta** : les volatilites restent fixes pour une moneyness conservee.  
-  Dans ce cas, la vol ATMF ne bouge pas quand le spot bouge, donc \(R_T=0\).
-
-Le modele local vol produit souvent un comportement plus rigide, intermediaire ou meme au-dessus de sticky-strike, typiquement avec \(R_T\approx 2\) a courte maturite.
-
-### A dire absolument
-
-- "Sticky-delta correspond a \(R_T=0\)."
-- "Sticky-strike correspond a \(R_T=1\)."
-
-### Piege a eviter
-
-Ne pas inverser les deux regimes.
-
----
-
-## 18) "Pourquoi parle-t-on de la regle \(R=2\) ?"
-
-### Reponse detaillee
-
-Si \(\alpha(t)\) est a peu pres constante sur les petites maturites, alors
-\[
-\frac{d\hat{\sigma}_{F_T,T}}{d\ln S_0}\approx \alpha,
 \qquad
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial\ln K}\right|_{K=F_T}\approx \frac{\alpha}{2}.
+x=\ln\!\left(\frac{S}{F_t}\right).
 \]
 
-Par consequent,
-\[
-R_T\approx 2.
-\]
+Cela permet de separer :
 
-Cela signifie qu'en local vol, la vol ATMF bouge environ **deux fois plus vite que le skew ATMF**, en un sens normalise.
-
-C'est un resultat tres connu car il montre que local vol tend a produire un smile **trop rigide** par rapport a ce qui est souvent observe sur les marches actions.
+- le niveau local \(\bar{\sigma}(t)\) ;
+- le skew local \(\alpha(t)\) ;
+- la courbure locale \(\beta(t)\).
 
 ### A dire absolument
 
-- "La regle \(R=2\) est un signal de rigidite excessive du smile sous local vol."
+- "C'est un developpement local en moneyness autour du forward."
 
 ### Piege a eviter
 
-Ne pas presenter \(R=2\) comme une loi universelle absolue.  
-C'est un resultat de ce cadre et un comportement typique a courte maturite.
+Ne pas oublier que ce developpement est local, donc surtout valable pres du forward.
 
 ---
 
-## 19) "Quel est l'interet du cas loi de puissance pour \(\alpha(t)\) ?"
+## 11) "Que representent \(\alpha(t)\) et \(\beta(t)\) ?"
 
 ### Reponse detaillee
 
-Il permet de decrire la structure par terme du skew.
+- \(\alpha(t)\) est le **skew local instantane** ;
+- \(\beta(t)\) est la **courbure locale instantanee**.
+
+Ils decrivent la forme locale de la fonction \(\sigma_{\mathrm{loc}}(t,S)\) en fonction de la moneyness.
+
+### A dire absolument
+
+- "\(\alpha(t)\) pilote la pente."
+- "\(\beta(t)\) pilote la convexite."
+
+### Piege a eviter
+
+Ne pas leur donner directement une interpretation dynamique plus large que celle visible dans les slides.
+
+---
+
+## 12) "Quelle est la formule du skew implicite pres du forward ?"
+
+### Reponse detaillee
+
+On obtient :
+\[
+\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt.
+\]
+
+Donc le skew implicite pres du forward est une moyenne ponderee du skew local \(\alpha(t)\).
+
+### A dire absolument
+
+- "Le poids est \(t/T\)."
+- "Le skew implicite ne recopie pas instantanement \(\alpha(t)\), il en fait une moyenne."
+
+### Piege a eviter
+
+Ne pas confondre cette formule avec une dynamique en spot : ici on parle bien d'une derivee en strike.
+
+---
+
+## 13) "Quelle est la formule de la courbure implicite ?"
+
+### Reponse detaillee
+
+On a :
+\[
+\left.\frac{\partial^2 \hat{\sigma}_{K,T}}{\partial (\ln K)^2}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \Big(\frac{t}{T}\Big)^2\beta(t)\,dt.
+\]
+
+Donc la courbure implicite est une moyenne ponderee de la courbure locale.
+
+### A dire absolument
+
+- "La courbure implicite depend de \(\beta(t)\)."
+
+### Piege a eviter
+
+Ne pas attribuer a \(\beta(t)\) le role principal dans les conclusions globales ; dans les slides, le message principal porte davantage sur le skew.
+
+---
+
+## 14) "Si \(\alpha(t)\) est constant, pourquoi trouve-t-on \(\alpha/2\) ?"
+
+### Reponse detaillee
+
+Si \(\alpha(t)\equiv \alpha\), alors
+\[
+\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \frac{t}{T}\alpha\,dt
+=
+\alpha\int_0^1 u\,du
+=
+\frac{\alpha}{2}.
+\]
+
+### A dire absolument
+
+- "Le facteur \(1/2\) vient simplement de l'integration du poids \(t/T\)."
+
+### Piege a eviter
+
+Ne pas dire que l'implicite "divise toujours le skew local par deux" ; c'est vrai ici quand \(\alpha(t)\) est constant.
+
+---
+
+## 15) "Que montre la loi de puissance pour \(\alpha(t)\) ?"
+
+### Reponse detaillee
 
 Si
 \[
-\alpha(t)\sim \alpha_0\left(\frac{\tau_0}{t}\right)^\gamma,
+\alpha(t)=\alpha_0\left(\frac{\tau_0}{t}\right)^\gamma
+\quad (t>\tau_0),
 \]
-alors le skew implicite ATMF se comporte comme
+alors a grande maturite
 \[
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial\ln K}\right|_{K=F_T}
+\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
 \sim
 \frac{1}{2-\gamma}\alpha_0\left(\frac{\tau_0}{T}\right)^\gamma.
 \]
 
-Donc :
-
-- le skew implicite decroit avec le **meme exposant** \(\gamma\) que le skew local ;
-- \(\alpha(t)\) ne controle pas seulement le niveau du skew, mais aussi sa **structure par terme**.
+Le point important est que le skew implicite herite du **meme exposant** \(\gamma\) que le skew local.
 
 ### A dire absolument
 
-- "L'exposant de decroissance se transmet du local vers l'implicite."
+- "Le modele transmet la structure par terme du skew local vers le skew implicite."
 
 ### Piege a eviter
 
-Ne pas oublier le cutoff \(\tau_0\), necessaire pour regulariser le comportement pres de 0.
+Ne pas oublier le role du cutoff \(\tau_0\), qui evite la divergence a courte maturite.
 
 ---
 
-## 20) "Quel est le resultat exact de courte maturite ?"
+## 16) "Quel est le resultat exact de courte maturite ?"
 
 ### Reponse detaillee
 
-Quand \(T\to 0\), Bergomi obtient un resultat exact :
+Quand \(T\to 0\),
 \[
 \frac{1}{\hat{\sigma}(0,K)}
 =
@@ -597,184 +444,127 @@ Quand \(T\to 0\), Bergomi obtient un resultat exact :
 \int_{S_0}^{K}\frac{dS}{S\,\sigma_{\mathrm{loc}}(0,S)}.
 \]
 
-Donc l'inverse de l'implicite est la moyenne harmonique de l'inverse de la local vol, prise en variable logarithmique entre \(S_0\) et \(K\).
-
-Ce resultat est tres fort, car il n'est plus perturbatif : ce n'est pas un developpement d'ordre 1, c'est une asymptotique exacte.
+Donc l'inverse de l'implicite est une moyenne harmonique de l'inverse de la local vol.
 
 ### A dire absolument
 
-- "A courte maturite, la bonne moyenne est harmonique."
+- "Le resultat est exact."
+- "La moyenne est harmonique, pas arithmetique."
 
 ### Piege a eviter
 
-Ne pas dire que c'est une moyenne de \(\sigma\) ou de \(\sigma^2\).
+Ne pas melanger ce resultat exact avec l'approximation weak local vol, qui est d'une autre nature.
 
 ---
 
-## 21) "Pourquoi la moyenne harmonique est-elle naturelle ici ?"
+## 17) "Pourquoi la moyenne est-elle harmonique a courte maturite ?"
 
 ### Reponse detaillee
 
-Elle est naturelle parce qu'a tres courte maturite, on ne fait presque plus de moyenne temporelle.  
-Le probleme devient essentiellement **spatial**.
+Parce qu'a tres courte maturite il n'y a presque plus d'averaging temporel.
 
-En outre, si la local vol s'annule sur une region separant \(S_0\) de \(K\), alors le spot ne peut pratiquement pas traverser cette region en temps tres court. L'implicite doit donc lui aussi tendre vers zero.
-
-La moyenne harmonique respecte exactement cette propriete, contrairement a une moyenne arithmetique naive.
+La relation entre local vol et implicite devient alors essentiellement spatiale : il faut "traverser" l'intervalle entre \(S_0\) et \(K\), et c'est l'inverse de la volatilite qui s'additionne naturellement dans cette limite.
 
 ### A dire absolument
 
-- "A courte maturite, c'est la geometrie spatiale qui domine."
+- "A courte maturite, la structure temporelle s'efface au profit d'une structure spatiale."
 
 ### Piege a eviter
 
-Ne pas donner une justification purement formelle ; l'argument de franchissement est tres parlant a l'oral.
+Ne pas dire simplement "c'est une autre moyenne". Il faut expliquer pourquoi le regime \(T\to 0\) change la nature du probleme.
 
 ---
 
-## 22) "Quel lien faire avec Dupire dans une question de cours ?"
+## 18) "Quel est le lien avec Dupire dans cette presentation ?"
 
 ### Reponse detaillee
 
-Le lien le plus propre est le suivant :
-
-- **Dupire** : de la surface implicite vers la local vol ;
-- **Bergomi 2.4** : de la local vol vers l'implicite et surtout vers la dynamique du smile.
-
-Donc ces deux approches sont complementaires.
-
-Le message a faire passer est qu'un modele local vol peut etre parfaitement calibre aujourd'hui grace a Dupire, tout en produisant demain une dynamique de smile qui n'est pas realiste.
-
-### A dire absolument
-
-- "Dupire traite le calibrage statique ; Bergomi eclaire la dynamique induite."
-
-### Piege a eviter
-
-Ne pas laisser croire que Dupire suffit a valider un modele du point de vue dynamique.
-
----
-
-## 23) "Pourquoi le local vol calibre bien les vanilles mais pas forcement les exotiques ?"
-
-### Reponse detaillee
-
-Parce que calibrer les vanilles aujourd'hui contraint seulement la **loi marginale** de \(S_T\) pour chaque maturite, ou equivalentement la surface de prix des options europeennes.
-
-Mais les exotiques dependent generalement de la **dynamique entiere du chemin** :
-
-- barrieres ;
-- cliquets ;
-- autocalls ;
-- produits sensibles aux deplacements futurs du smile.
-
-Or le modele local vol impose une dynamique tres particuliere du smile.  
-Donc un calibrage parfait des vanilles a la date 0 n'implique pas une bonne modelisation des exotiques.
-
-### A dire absolument
-
-- "Calibration statique parfaite ne veut pas dire dynamique correcte."
-
-### Piege a eviter
-
-Ne pas dire que local vol est "mauvais".  
-Il est excellent pour certaines taches, mais limite pour d'autres.
-
----
-
-## 24) "Pourquoi les modeles de volatilite stochastique sont-ils souvent preferes pour la dynamique du smile ?"
-
-### Reponse detaillee
-
-Parce qu'ils introduisent des facteurs de variance futurs aleatoires.
-
-Dans un modele local vol, toute la dynamique future de la surface implicite est determinee par la seule variable d'etat \(S_t\).  
-Dans un modele de volatilite stochastique, on a en plus un ou plusieurs facteurs de volatilite/variance, ce qui donne davantage de flexibilite.
-
-Du point de vue smile dynamics :
-
-- local vol est souvent trop rigide ;
-- stochastic vol reproduit souvent mieux des regimes proches de sticky-delta ou intermediaires.
-
-### A dire absolument
-
-- "Le facteur supplementaire de variance donne la souplesse qui manque a local vol."
-
-### Piege a eviter
-
-Ne pas opposer caricaturalement les deux modeles : local vol reste tres utile comme modele de calibration et d'analyse.
-
----
-
-## 25) "Quel est selon vous le message central a retenir pour conclure ?"
-
-### Reponse detaillee
-
-Le message central est le suivant :
-
-> Un modele de volatilite locale ne se contente pas de reproduire une surface implicite statique ; il impose une dynamique tres precise du smile, largement gouvernee par la structure par terme du skew local \(\alpha(t)\).
-
-En particulier :
-
-- le skew implicite est une moyenne ponderee de \(\alpha(t)\) ;
-- la dynamique ATMF est donnee par la moyenne uniforme de \(\alpha(t)\) ;
-- le ratio \(R_T\) met en evidence la rigidite typique du smile sous local vol ;
-- a courte maturite, la relation entre local vol et implicite devient une moyenne harmonique exacte.
-
-Donc cette section explique tres bien pourquoi un bon calibrage statique n'est pas une garantie de bonne dynamique.
-
-### A dire absolument
-
-- "Le coeur du chapitre, c'est la dynamique du smile."
-
-### Piege a eviter
-
-Ne pas terminer sur une simple liste de formules.  
-Il faut finir par une idee directrice.
-
----
-
-# Reponses tres courtes si on te coupe vite
-
-## "Le message en une phrase ?"
-
-Sous local vol, le smile implicite futur est entierement contraint par la geometrie de \(\sigma_{\mathrm{loc}}(t,S)\), surtout via \(\alpha(t)\).
-
-## "La formule cle ?"
-
+Dupire fait le chemin
 \[
-\hat{\sigma}_{K,T}^{\,2}
-=
-\frac{
-\mathbb E\!\left[\int_0^T w_t\,\sigma_{\mathrm{loc}}^2(t,S_t)\,dt\right]
-}{
-\mathbb E\!\left[\int_0^T w_t\,dt\right]
-},
-\qquad
-w_t=e^{-rt}S_t^2\Gamma_t.
+\hat{\sigma}(K,T)\longrightarrow \sigma_{\mathrm{loc}}(t,S).
 \]
 
-## "Le resultat cle sur le skew ?"
-
+Ici, Bergomi regarde le chemin inverse
 \[
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial\ln K}\right|_{K=F_T}
-=
-\frac1T\int_0^T \frac{t}{T}\alpha(t)\,dt.
+\sigma_{\mathrm{loc}}(t,S)\longrightarrow \hat{\sigma}(K,T).
 \]
 
-## "Le resultat cle sur l'ATMF ?"
+Donc les deux points de vue sont complementaires.
 
-\[
-\frac{d\hat{\sigma}_{F_T,T}}{d\ln S_0}
-=
-\frac1T\int_0^T\alpha(t)\,dt.
-\]
+### A dire absolument
 
-## "Le resultat cle de courte maturite ?"
+- "Dupire construit la local vol depuis la surface."
+- "Bergomi etudie la surface implicite produite par une local vol donnee."
 
-\[
-\frac{1}{\hat{\sigma}(0,K)}
-=
-\frac{1}{\ln(K/S_0)}
-\int_{S_0}^{K}\frac{dS}{S\,\sigma_{\mathrm{loc}}(0,S)}.
-\]
+### Piege a eviter
+
+Ne pas dire que Bergomi "inverse explicitement" Dupire partout ; il obtient d'abord une identite exacte implicite, puis une approximation exploitable.
+
+---
+
+## 19) "Pourquoi Bergomi parle-t-il des limites de l'approximation ?"
+
+### Reponse detaillee
+
+Parce que l'approximation weak local vol est une approximation d'ordre 1.
+
+Elle est tres utile pour comprendre :
+
+- le skew ;
+- la courbure ;
+- l'intuition geometrique.
+
+Mais elle n'est pas assez precise pour reproduire parfaitement des niveaux de volatilite implicite sur des smiles equity realistes.
+
+### A dire absolument
+
+- "Tres utile pour comprendre, pas suffisante pour du pricing de precision."
+
+### Piege a eviter
+
+Ne pas dire que l'approximation est mauvaise en tout ; elle est excellente conceptuellement.
+
+---
+
+## 20) "Quel lien fais-tu avec les modeles de volatilite stochastique ?"
+
+### Reponse detaillee
+
+Dans cette presentation, le lien reste simple :
+
+- le modele local vol donne une interpretation analytique claire des smiles ;
+- mais il peut etre trop contraint pour reproduire toute la richesse observee sur les marches ;
+- d'ou l'interet des modeles de volatilite stochastique pour mieux decrire certaines dynamiques de surface.
+
+### A dire absolument
+
+- "Local vol est tres bon pour relier statiquement la surface et la fonction locale."
+- "Mais il ne suffit pas toujours pour toute la dynamique observee."
+
+### Piege a eviter
+
+Ne pas partir dans une comparaison trop large si le jury ne te la demande pas ; dans tes slides, ce point reste une conclusion.
+
+---
+
+## 21) "Quel est le message final de la presentation ?"
+
+### Reponse detaillee
+
+Le message final est :
+
+1. il existe une identite exacte liant variance implicite et variance locale ;
+2. une approximation d'ordre 1 permet de lire la local vol comme une moyenne geometrique/gaussienne ;
+3. pres du forward, le skew implicite est une moyenne ponderee de \(\alpha(t)\) ;
+4. a courte maturite, on retrouve un resultat exact harmonique ;
+5. tout cela explique comment une local vol impose une forme de smile implicite.
+
+### A dire absolument
+
+- "Le mot-cle est : averaging."
+- "Le deuxieme mot-cle est : structure pres du forward."
+
+### Piege a eviter
+
+Ne pas finir sur un detail technique ; il faut finir sur l'idee generale.
+

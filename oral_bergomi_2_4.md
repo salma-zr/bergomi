@@ -223,7 +223,7 @@ Le message principal est que le skew implicite est une moyenne ponderee du skew 
 Si \(\alpha(t)\) est constant, alors on retrouve le resultat classique :
 \[
 \text{skew implicite ATMF}=\frac{\alpha}{2}.
-\]"
+\]
 
 ### Ce que j'ecris au tableau
 
