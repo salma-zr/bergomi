@@ -176,6 +176,10 @@ w_t=e^{-rt}S_t^2\Gamma_t
 \item "Le mot important est : moyenne ponderee."
 \end{itemize}
 
+\subsection{Ce que la formule fait, en une phrase}
+
+Elle transforme une information locale instantanee, \(\sigma_{\mathrm{loc}}(t,S)\), en une quantite observable de marche, \(\hat{\sigma}_{K,T}\), en disant quelles zones de temps et de spot comptent vraiment pour l'option.
+
 \bigskip\hrule\bigskip
 
 \section{Slide 3 -- Approximation faible local vol}
@@ -220,6 +224,10 @@ x_K=\ln\!\left(\frac{K}{F_T}\right),\qquad
 \item "Si on ne garde que le chemin central \(y=0\), on obtient une image intuitive du chemin le plus probable."
 \end{itemize}
 
+\subsection{Ce que la formule fait, en une phrase}
+
+Elle remplace une formule exacte mais inutilisable directement par une formule simple qui dit, en gros, que l'implicite est une moyenne de local vol le long de chemins raisonnables entre aujourd'hui et le strike.
+
 \bigskip\hrule\bigskip
 
 \section{Slide 4 -- Smile pres du forward : parametrisation locale}
@@ -252,6 +260,10 @@ L'idee de Bergomi est simple : en remplaçant cette expansion dans la formule fa
 \item "On linearise localement la local vol autour du forward."
 \item "Le parametre vraiment central pour le skew sera \(\alpha(t)\)."
 \end{itemize}
+
+\subsection{Ce que la formule fait, en une phrase}
+
+Elle decompose la local vol en trois effets simples : le niveau, la pente du smile local, et sa courbure.
 
 \bigskip\hrule\bigskip
 
@@ -304,6 +316,10 @@ Si \(\alpha(t)\) est constant, alors on retrouve le resultat classique :
 \item "Le poids \(t/T\) favorise les temps proches de la maturite."
 \end{itemize}
 
+\subsection{Ce que la formule fait, en une phrase}
+
+Elle relie directement la pente et la courbure du smile implicite aux coefficients \(\alpha(t)\) et \(\beta(t)\) de la local vol.
+
 \bigskip\hrule\bigskip
 
 \section{Slide 6 -- Structure par terme du skew : loi de puissance}
@@ -344,6 +360,10 @@ Donc l'exposant de decroissance du skew implicite est le meme que celui du skew 
 \item "Le modele transporte donc directement l'information temporelle du skew local vers le skew implicite."
 \end{itemize}
 
+\subsection{Ce que la formule fait, en une phrase}
+
+Elle montre que si le skew local decroit comme une loi de puissance, alors le skew implicite decroit avec le meme exposant.
+
 \bigskip\hrule\bigskip
 
 \section{Slide 7 -- Maturites courtes : resultat exact}
@@ -381,6 +401,10 @@ C'est important parce qu'a tres courte maturite, il n'y a presque plus de moyenn
 \item "Si la local vol devient tres faible sur une zone a traverser, l'implicite courte maturite doit aussi refleter cette difficulte de passage."
 \end{itemize}
 
+\subsection{Ce que la formule fait, en une phrase}
+
+Elle donne une relation exacte en maturite tres courte entre local vol et implicite, sans passer par l'approximation weak local vol.
+
 \bigskip\hrule\bigskip
 
 \section{Slide 8 -- A retenir : Dupire, stoch vol, limites}
@@ -415,6 +439,10 @@ Donc le chapitre est extremement utile pour l'intuition et pour l'analyse theori
 \item "Mais les formules weak local vol restent des formules d'ordre 1."
 \end{itemize}
 
+\subsection{Ce que cette slide fait, en une phrase}
+
+Elle replace tout le chapitre dans son vrai cadre : un outil d'analyse tres fort pour comprendre le smile, mais pas une recette numerique parfaite de marche.
+
 \bigskip\hrule\bigskip
 
 \section{Timing total indicatif}
@@ -448,29 +476,30 @@ tu arrives naturellement autour de \textbf{10 minutes}, ce qui est coherent avec
 Si tu dois absolument reduire l'ecriture au tableau, garde seulement :
 
 \begin{enumerate}
-\item
-\[
+\item \[
+\end{enumerate}
 \hat{\sigma}_{K,T}^{\,2}
 =
 \frac{\mathbb E[\int_0^T w_t\,\sigma_{\mathrm{loc}}^2\,dt]}
 {\mathbb E[\int_0^T w_t\,dt]}
 \]
 
-\item
-\[
+\begin{enumerate}
+\item \[
+\end{enumerate}
 \left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
 =
 \frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt
 \]
 
-\item
-\[
+\begin{enumerate}
+\item \[
+\end{enumerate}
 \frac{1}{\hat{\sigma}(0,K)}
 =
 \frac{1}{\ln(K/S_0)}
 \int_{S_0}^{K}\frac{dS}{S\,\sigma_{\mathrm{loc}}(0,S)}
 \]
-\end{enumerate}
 
 Ce sont les trois formules les plus defendables si on te demande le coeur mathematique du passage.
 \end{document}

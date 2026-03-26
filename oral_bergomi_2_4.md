@@ -123,6 +123,10 @@ w_t=e^{-rt}S_t^2\Gamma_t
 - "Elle donne plus de poids aux zones ou son gamma est fort."
 - "Le mot important est : moyenne ponderee."
 
+### Ce que la formule fait, en une phrase
+
+Elle transforme une information locale instantanee, \(\sigma_{\mathrm{loc}}(t,S)\), en une quantite observable de marche, \(\hat{\sigma}_{K,T}\), en disant quelles zones de temps et de spot comptent vraiment pour l'option.
+
 ---
 
 ## Slide 3 — Approximation faible local vol
@@ -165,6 +169,10 @@ x_K=\ln\!\left(\frac{K}{F_T}\right),\qquad
 - "Le point cle ici est qu'on passe d'une formule exacte implicite a une formule approchee lisible."
 - "Si on ne garde que le chemin central \(y=0\), on obtient une image intuitive du chemin le plus probable."
 
+### Ce que la formule fait, en une phrase
+
+Elle remplace une formule exacte mais inutilisable directement par une formule simple qui dit, en gros, que l'implicite est une moyenne de local vol le long de chemins raisonnables entre aujourd'hui et le strike.
+
 ---
 
 ## Slide 4 — Smile pres du forward : parametrisation locale
@@ -195,6 +203,10 @@ L'idee de Bergomi est simple : en remplaçant cette expansion dans la formule fa
 
 - "On linearise localement la local vol autour du forward."
 - "Le parametre vraiment central pour le skew sera \(\alpha(t)\)."
+
+### Ce que la formule fait, en une phrase
+
+Elle decompose la local vol en trois effets simples : le niveau, la pente du smile local, et sa courbure.
 
 ---
 
@@ -245,6 +257,10 @@ Si \(\alpha(t)\) est constant, alors on retrouve le resultat classique :
 - "Il en fait une moyenne temporelle ponderee."
 - "Le poids \(t/T\) favorise les temps proches de la maturite."
 
+### Ce que la formule fait, en une phrase
+
+Elle relie directement la pente et la courbure du smile implicite aux coefficients \(\alpha(t)\) et \(\beta(t)\) de la local vol.
+
 ---
 
 ## Slide 6 — Structure par terme du skew : loi de puissance
@@ -283,6 +299,10 @@ Donc l'exposant de decroissance du skew implicite est le meme que celui du skew 
 - "Le point cle ici est que la structure par terme de l'implicite herite de celle de \(\alpha(t)\)."
 - "Le modele transporte donc directement l'information temporelle du skew local vers le skew implicite."
 
+### Ce que la formule fait, en une phrase
+
+Elle montre que si le skew local decroit comme une loi de puissance, alors le skew implicite decroit avec le meme exposant.
+
 ---
 
 ## Slide 7 — Maturites courtes : resultat exact
@@ -318,6 +338,10 @@ C'est important parce qu'a tres courte maturite, il n'y a presque plus de moyenn
 - "La bonne moyenne ici est harmonique, pas arithmetique."
 - "Si la local vol devient tres faible sur une zone a traverser, l'implicite courte maturite doit aussi refleter cette difficulte de passage."
 
+### Ce que la formule fait, en une phrase
+
+Elle donne une relation exacte en maturite tres courte entre local vol et implicite, sans passer par l'approximation weak local vol.
+
 ---
 
 ## Slide 8 — A retenir : Dupire, stoch vol, limites
@@ -349,6 +373,10 @@ Donc le chapitre est extremement utile pour l'intuition et pour l'analyse theori
 
 - "Le message central est : la local vol impose une structure au smile implicite."
 - "Mais les formules weak local vol restent des formules d'ordre 1."
+
+### Ce que cette slide fait, en une phrase
+
+Elle replace tout le chapitre dans son vrai cadre : un outil d'analyse tres fort pour comprendre le smile, mais pas une recette numerique parfaite de marche.
 
 ---
 
