@@ -1,63 +1,54 @@
-# Presentation orale — Bergomi 2.4 a 2.4.6
+# Presentation orale — section "Passage de la volatilite locale a la volatilite implicite"
 
-## Objectif
+Ce document est maintenant **synchronise avec les slides actuels** de `Partie_jules.tex`.
 
-Ce document est concu pour accompagner **la partie de 10 a 12 minutes** sur :
+Il suit **exactement** les frames presentes dans la presentation :
 
-- 2.4.1 : volatilite implicite comme moyenne ponderee de volatilite locale,
-- 2.4.2-2.4.4 : approximation "weakly local vol",
-- 2.4.5 : skew, dynamique ATMF, role de \(\alpha(t)\), ratio \(R_T\),
-- 2.4.6 : resultat exact a courte maturite.
+1. Du local vol vers l'implicite : la question
+2. Identite exacte : moyenne ponderee de variance locale
+3. Approximation faible local vol
+4. Smile pres du forward : parametrisation locale
+5. Skew et courbure implicites : moyennes ponderees
+6. Structure par terme du skew : loi de puissance
+7. Maturites courtes : resultat exact
+8. A retenir : Dupire, stoch vol, limites
 
-Il est organise slide par slide.
+Le but est de te donner, pour **chaque slide** :
+
+- ce que tu dis ;
+- ce que tu ecris au tableau ;
+- les phrases d'intuition ;
+- un temps cible.
 
 ---
 
-## Avant la soutenance : liens explicites avec le cours a maitriser
+## Avant la soutenance : liens de cours a maitriser
 
-Comme les questions porteront aussi sur le contenu du cours, il faut etre capable de rattacher Bergomi 2.4 aux themes classiques de M2 Probabilites & Finance :
+Les questions d'oral peuvent aussi porter sur le cours. Pour cette section, les ponts a connaitre sont :
 
-1. **Mesure risque-neutre et dynamique de l'actif**
+1. **Mesure risque-neutre**
    - savoir expliquer pourquoi on ecrit
    \[
    dS_t=(r-q)S_t\,dt+\sigma_t S_t\,dW_t
    \]
-   sous la mesure de pricing ;
-   - savoir distinguer volatilite locale deterministe en \((t,S)\) et volatilite stochastique.
+   sous la mesure de pricing.
 
-2. **EDP de pricing / Feynman-Kac**
-   - savoir retrouver l'EDP
-   \[
-   \partial_t P+(r-q)S\partial_S P+\frac12 \sigma^2 S^2\partial_{SS}P-rP=0 ;
-   \]
-   - comprendre que l'identite de Bergomi repose sur Itô applique a \(e^{-rt}P(t,S_t)\).
+2. **Itô / EDP / Feynman-Kac**
+   - savoir dire d'ou vient l'EDP de pricing ;
+   - comprendre pourquoi un terme gamma apparait dans un P&L de couverture delta.
 
 3. **Dupire**
-   - savoir rappeler que Dupire reconstruit \(\sigma_{\mathrm{loc}}(T,K)\) a partir de la surface vanille ;
-   - expliquer que Bergomi regarde le probleme inverse : que devient l'implicite si on part de \(\sigma_{\mathrm{loc}}\) ?
+   - Dupire : implicite \(\to\) local vol ;
+   - ici : local vol \(\to\) implicite.
 
-4. **Smile, skew, curvature**
-   - savoir definir rigoureusement
+4. **Smile / skew / courbure**
+   - savoir definir
    \[
-   \partial_{\ln K}\hat{\sigma},\qquad \partial_{\ln K\ln K}\hat{\sigma},
+   \partial_{\ln K}\hat{\sigma},\qquad \partial^2_{\ln K}\hat{\sigma}.
    \]
-   et expliquer leur interpretation financiere.
 
-5. **Dynamique du smile**
-   - comprendre la difference entre :
-     - mouvement a strike fixe,
-     - mouvement ATMF,
-     - regimes sticky-strike / sticky-delta.
-
-6. **Asymptotiques de courte maturite**
-   - savoir expliquer pourquoi \(T\to 0\) change la nature de la moyenne ;
-   - comprendre la difference entre moyenne temporelle de variances et moyenne spatiale harmonique.
-
-7. **Calibration statique vs dynamique**
-   - point tres classique de cours : un modele peut calibrer la surface a \(t=0\) mais mal decrire sa dynamique future.
-
-Si on te pose une question "de cours", les ponts les plus probables sont donc :
-**Itô / Feynman-Kac / Dupire / smile dynamics / asymptotique courte maturite / calibration vs dynamique.**
+5. **Asymptotique courte maturite**
+   - savoir expliquer pourquoi on obtient une moyenne harmonique.
 
 ---
 
@@ -68,95 +59,101 @@ Si on te pose une question "de cours", les ponts les plus probables sont donc :
 
 ### Ce que je dis
 
-"Dans cette partie, on se place dans un modele de volatilite locale, donc
+"Dans cette partie, on part d'un modele de volatilite locale :
 \[
-dS_t=(r-q)S_tdt+\sigma_{\mathrm{loc}}(t,S_t)S_tdW_t.
+dS_t=(r-q)S_t\,dt+\sigma_{\mathrm{loc}}(t,S_t)S_t\,dW_t.
 \]
-La formule de Dupire permet de construire la volatilite locale a partir de la surface implicite. Mais Bergomi pose ici la question inverse : si je fixe une fonction de volatilite locale, quel smile implicite est produit, et surtout quelle dynamique de smile cela implique quand le spot bouge ?
 
-L'enjeu est tres important en pratique, parce qu'un modele peut bien calibrer la surface aujourd'hui, mais produire une dynamique de smile peu realiste demain."
+La formule de Dupire fait normalement le chemin de la surface implicite vers la volatilite locale. Ici, Bergomi pose le probleme inverse : si je fixe une fonction de volatilite locale, quelle volatilite implicite est produite ?
+
+Le point important est que l'on ne cherche pas seulement un niveau d'implicite, mais une interpretation mathematique de ce qu'elle represente."
 
 ### Ce que j'ecris au tableau
 
 \[
-\sigma_{\mathrm{loc}}(t,S)\ \Longrightarrow\ \hat{\sigma}(K,T)
+\sigma_{\mathrm{loc}}(t,S)\quad \Longrightarrow \quad \hat{\sigma}(K,T)
 \]
 
 ### Phrases d'intuition
 
-- "Le point cle ici est qu'on ne cherche plus a calibrer, mais a comprendre la dynamique induite."
-- "Financierement, la vraie question n'est pas seulement le fit du smile aujourd'hui, mais sa reaction demain apres un mouvement de spot."
+- "Le point cle ici est qu'on remonte de la dynamique locale vers le smile implicite."
+- "Autrement dit, on cherche ce que 'voit' le marche des vanilles quand le monde sous-jacent suit une local vol."
 
 ---
 
 ## Slide 2 — Identite exacte : moyenne ponderee de variance locale
 
 ### Temps cible
-1 min 10
+1 min 15
 
 ### Ce que je dis
 
-"Bergomi commence par une identite exacte. En comparant un modele de base et un modele reel, puis en regardant le P\&L d'une couverture delta, il obtient une formule qui exprime la volatilite implicite au carre comme une moyenne ponderee de la variance locale.
-
-La formule est :
+"Bergomi obtient d'abord une identite exacte. La variance implicite s'ecrit comme une moyenne ponderee de la variance locale :
 \[
 \hat{\sigma}_{K,T}^{\,2}
 =
 \frac{
 \mathbb{E}^{\mathrm{loc}}\!\left[
-\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}\,\sigma_{\mathrm{loc}}^2(t,S_t)\,dt
+\int_0^T e^{-rt} S_t^2 \Gamma_t^{BS}(\hat{\sigma}_{K,T})
+\sigma_{\mathrm{loc}}^2(t,S_t)\,dt
 \right]
 }{
 \mathbb{E}^{\mathrm{loc}}\!\left[
-\int_0^T e^{-rt}S_t^2\Gamma_t^{BS}\,dt
+\int_0^T e^{-rt} S_t^2 \Gamma_t^{BS}(\hat{\sigma}_{K,T})\,dt
 \right]
 }.
 \]
 
-Donc l'implicite n'est pas la valeur de la local vol a un point ; c'est une moyenne de la variance locale le long des trajectoires, avec des poids de type dollar gamma."
+Donc l'objet exact n'est pas la vol implicite elle-meme, mais sa variance. Les poids sont des dollar gammas actualises."
 
 ### Ce que j'ecris au tableau
 
 \[
 \hat{\sigma}_{K,T}^{\,2}
 =
-\frac{\mathbb{E}\big[\int_0^T w_t\,\sigma_{\mathrm{loc}}^2(t,S_t)\,dt\big]}
-{\mathbb{E}\big[\int_0^T w_t\,dt\big]},
+\frac{\mathbb E\!\left[\int_0^T w_t\,\sigma_{\mathrm{loc}}^2(t,S_t)\,dt\right]}
+{\mathbb E\!\left[\int_0^T w_t\,dt\right]},
 \qquad
 w_t=e^{-rt}S_t^2\Gamma_t
 \]
 
 ### Phrases d'intuition
 
-- "Intuitivement, l'option regarde surtout les regions ou son gamma est fort."
-- "Ce que cela signifie financierement, c'est qu'une variance locale situee dans une zone peu visitee ou peu sensible compte peu."
+- "L'option ne moyenne pas uniformement la variance locale."
+- "Elle donne plus de poids aux zones ou son gamma est fort."
+- "Le mot important est : moyenne ponderee."
 
 ---
 
 ## Slide 3 — Approximation faible local vol
 
 ### Temps cible
-1 min 05
+1 min 10
 
 ### Ce que je dis
 
-"Cette identite exacte est tres elegante, mais elle est implicite et difficile a utiliser directement. Bergomi suppose donc que la local vol est une petite perturbation autour d'une volatilite de reference constante \(\sigma_0\).
-
-On obtient alors une formule d'ordre 1 :
+"L'identite exacte est belle, mais elle est implicite et difficile a manipuler. Bergomi suppose alors que la local vol est une petite perturbation autour d'une vol de reference \(\sigma_0\). On obtient :
 \[
 \hat{\sigma}_{K,T}
 \approx
-\frac1T\int_0^Tdt\int_{\mathbb R}\phi(y)\,
-\sigma_{\mathrm{loc}}\!\left(t,F_t\exp\!\left(\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}y\right)\right)dy.
+\frac{1}{T}
+\int_0^T\!\!dt
+\int_{\mathbb{R}}\phi(y)\,
+\sigma_{\mathrm{loc}}\!\left(
+t,\,
+F_t\exp\!\Big(
+\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
+\Big)
+\right)dy.
 \]
 
-Le point important, c'est que l'implicite devient une moyenne gaussienne de la local vol le long de trajectoires joignant \(S_0\) a \(K\)."
+Cette formule donne une interpretation geometrique : l'implicite est une moyenne gaussienne de la local vol le long de trajectoires intermediaires reliant \(S_0\) au strike."
 
 ### Ce que j'ecris au tableau
 
 \[
-x_K=\ln(K/F_T),\qquad
-S(t,y)=F_t\exp\!\left(\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}y\right)
+x_K=\ln\!\left(\frac{K}{F_T}\right),\qquad
+\phi(y)=\frac{e^{-y^2/2}}{\sqrt{2\pi}}
 \]
 
 \[
@@ -165,26 +162,28 @@ S(t,y)=F_t\exp\!\left(\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}y\right)
 
 ### Phrases d'intuition
 
-- "Le point cle ici est la geometrie des trajectoires : on moyenne sur des ponts lognormaux."
-- "Si je prends seulement \(y=0\), je regarde le chemin le plus probable entre le spot initial et le strike final."
+- "Le point cle ici est qu'on passe d'une formule exacte implicite a une formule approchee lisible."
+- "Si on ne garde que le chemin central \(y=0\), on obtient une image intuitive du chemin le plus probable."
 
 ---
 
-## Slide 4 — Parametrisation locale autour du forward
+## Slide 4 — Smile pres du forward : parametrisation locale
 
 ### Temps cible
 55 secondes
 
 ### Ce que je dis
 
-"Pour etudier le smile pres du forward, on developpe la local vol en moneyness
+"Pour etudier le smile pres du forward, on developpe la local vol en moneyness :
 \[
-x=\ln(S/F_t),
+\sigma_{\mathrm{loc}}(t,S)=\bar{\sigma}(t)+\alpha(t)x+\frac{\beta(t)}{2}x^2,
 \qquad
-\sigma_{\mathrm{loc}}(t,S)=\bar{\sigma}(t)+\alpha(t)x+\frac{\beta(t)}{2}x^2.
+x=\ln\!\left(\frac{S}{F_t}\right).
 \]
 
-Ici, \(\alpha(t)\) mesure le skew local instantane et \(\beta(t)\) la courbure locale instantanee. En reinjectant ce developpement dans la formule precedente, on peut lire directement le skew et la convexite implicites."
+Ici \(\alpha(t)\) est le skew local instantane, et \(\beta(t)\) la courbure locale instantanee.
+
+L'idee de Bergomi est simple : en remplaçant cette expansion dans la formule faible local vol, on va lire directement le skew et la courbure implicites."
 
 ### Ce que j'ecris au tableau
 
@@ -194,186 +193,82 @@ Ici, \(\alpha(t)\) mesure le skew local instantane et \(\beta(t)\) la courbure l
 
 ### Phrases d'intuition
 
-- "Intuitivement, \(\alpha(t)\) est la pente locale du smile instantane."
-- "Le point cle ici est que toute la dynamique du smile va etre gouvernee principalement par \(\alpha(t)\)."
+- "On linearise localement la local vol autour du forward."
+- "Le parametre vraiment central pour le skew sera \(\alpha(t)\)."
 
 ---
 
-## Slide 5 — Le skew implicite est une moyenne ponderee de \(\alpha(t)\)
+## Slide 5 — Skew et courbure implicites : moyennes ponderees
 
 ### Temps cible
-1 min 10
+1 min 20
 
 ### Ce que je dis
 
-"Le calcul donne
+"Le calcul donne alors :
 \[
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
 =
-\frac1T\int_0^T \frac{t}{T}\alpha(t)\,dt.
+\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt,
+\]
+et
+\[
+\left.\frac{\partial^2 \hat{\sigma}_{K,T}}{\partial (\ln K)^2}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \Big(\frac{t}{T}\Big)^2\beta(t)\,dt.
 \]
 
-C'est une formule tres importante : le skew implicite ATMF est une moyenne ponderee du skew local instantane \(\alpha(t)\). Le poids n'est pas uniforme : c'est \(t/T\), donc les temps proches de la maturite comptent davantage.
+Le message principal est que le skew implicite est une moyenne ponderee du skew local \(\alpha(t)\), avec un poids \(t/T\).
 
-Si \(\alpha(t)\) est constant, on obtient simplement
+Si \(\alpha(t)\) est constant, alors on retrouve le resultat classique :
 \[
 \text{skew implicite ATMF}=\frac{\alpha}{2}.
-\]
-Donc l'implicite retient seulement la moitie du skew local constant."
+\]"
 
 ### Ce que j'ecris au tableau
 
 \[
-S_T^{\mathrm{ATMF}}
-:=
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
 =
-\frac1T\int_0^T \frac{t}{T}\alpha(t)\,dt
+\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt
 \]
 
 \[
-\alpha(t)\equiv \alpha
+\alpha(t)\equiv\alpha
 \quad\Longrightarrow\quad
-S_T^{\mathrm{ATMF}}=\frac{\alpha}{2}
+\text{skew implicite}=\frac{\alpha}{2}
 \]
 
 ### Phrases d'intuition
 
-- "Pourquoi ce poids \(t/T\) ? Parce qu'au debut de la vie de l'option, le strike terminal ne contraint presque pas encore la trajectoire."
-- "A l'inverse, pres de l'echeance, atteindre le strike final devient essentiel."
+- "Le smile implicite ne recopie pas directement le skew local."
+- "Il en fait une moyenne temporelle ponderee."
+- "Le poids \(t/T\) favorise les temps proches de la maturite."
 
 ---
 
-## Slide 6 — Mouvement du smile pour un strike fixe quand le spot bouge
-
-### Temps cible
-1 min
-
-### Ce que je dis
-
-"Bergomi calcule ensuite la reaction de l'implicite a un mouvement du spot, a strike fixe :
-\[
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial \ln S_0}\right|_{K=F_T}
-=
-\frac1T\int_0^T\left(1-\frac{t}{T}\right)\alpha(t)\,dt.
-\]
-
-Cette fois, les temps courts portent le plus de poids. C'est logique : quand le spot bouge aujourd'hui, l'impact se fait d'abord sentir au debut de la trajectoire."
-
-### Ce que j'ecris au tableau
-
-\[
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial \ln S_0}\right|_{K=F_T}
-=
-\frac1T\int_0^T\left(1-\frac{t}{T}\right)\alpha(t)\,dt
-\]
-
-### Phrases d'intuition
-
-- "Le point cle ici est l'opposition entre deux poids complements : \(t/T\) pour le skew en strike, \(1-t/T\) pour la reaction au spot a strike fixe."
-- "Ce que cela signifie financierement, c'est que le strike fixe et le spot ne sondent pas la meme partie de la structure temporelle du skew local."
-
----
-
-## Slide 7 — Dynamique ATMF
-
-### Temps cible
-1 min 05
-
-### Ce que je dis
-
-"Le cas le plus important pour le marche est l'ATMF. Comme le strike ATMF verifie \(K=F_T(S_0)\), quand le spot bouge il faut tenir compte a la fois de l'effet direct sur le smile et de la translation du strike ATMF.
-
-On obtient :
-\[
-\frac{d\hat{\sigma}_{F_T,T}}{d\ln S_0}
-=
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial \ln S_0}\right|_{K=F_T}
-+
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
-=
-\frac1T\int_0^T \alpha(t)\,dt.
-\]
-
-Donc la dynamique de la volatilite ATMF depend uniquement de la structure par terme de \(\alpha(t)\), avec cette fois un poids uniforme."
-
-### Ce que j'ecris au tableau
-
-\[
-\frac{d\hat{\sigma}_{F_T,T}}{d\ln S_0}
-=
-\frac1T\int_0^T \alpha(t)\,dt
-\]
-
-### Phrases d'intuition
-
-- "Le point cle ici est que toutes les dates comptent pareil."
-- "Financierement, la vol ATMF est entierement pilotee par la courbe de skew local instantane."
-
----
-
-## Slide 8 — Le ratio \(R_T\)
-
-### Temps cible
-1 min 10
-
-### Ce que je dis
-
-"Bergomi introduit alors un ratio tres parlant :
-\[
-R_T
-=
-\frac{\dfrac{d\hat{\sigma}_{F_T,T}}{d\ln S_0}}
-{\left.\dfrac{\partial\hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}}.
-\]
-
-Il mesure combien la vol ATMF bouge en unite du skew ATMF. En remplaçant les formules precedentes, on trouve
-\[
-R_T=
-\frac{\int_0^T \alpha(t)\,dt}
-{\int_0^T \frac{t}{T}\alpha(t)\,dt}.
-\]
-
-Si \(\alpha(t)\) est constant, on obtient \(R_T=2\). C'est la fameuse regle du \(R=2\) en local vol."
-
-### Ce que j'ecris au tableau
-
-\[
-R_T=
-\frac{\int_0^T \alpha(t)\,dt}
-{\int_0^T \frac{t}{T}\alpha(t)\,dt}
-\]
-
-\[
-\alpha(t)\equiv \alpha \quad\Longrightarrow\quad R_T=2
-\]
-
-### Phrases d'intuition
-
-- "Sous local vol, le smile est rigide : quand le spot baisse, la vol ATMF monte souvent trop fortement."
-- "C'est justement l'une des critiques classiques des modeles de volatilite locale sur les sous-jacents equity."
-
----
-
-## Slide 9 — Structure par terme du skew : loi de puissance
+## Slide 6 — Structure par terme du skew : loi de puissance
 
 ### Temps cible
 55 secondes
 
 ### Ce que je dis
 
-"Bergomi regarde ensuite un cas important en pratique : une structure de skew locale de type loi de puissance,
+"Bergomi regarde ensuite le cas ou le skew local suit une loi de puissance :
 \[
-\alpha(t)\sim \alpha_0\left(\frac{\tau_0}{t}\right)^\gamma.
-\]
-Alors le skew implicite ATMF decroit, a longue maturite, avec le meme exposant \(\gamma\) :
-\[
-\left.\frac{\partial\hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
-\sim
-\frac{1}{2-\gamma}\alpha_0\left(\frac{\tau_0}{T}\right)^\gamma.
+\alpha(t)=\alpha_0\left(\frac{\tau_0}{t}\right)^\gamma
+\quad (t>\tau_0).
 \]
 
-Donc la structure par terme du smile implicite herite directement de celle de \(\alpha(t)\)."
+Dans ce cas, le skew implicite ATMF verifie a longue maturite :
+\[
+\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+\sim
+\frac{1}{2-\gamma}\,
+\alpha_0\left(\frac{\tau_0}{T}\right)^\gamma.
+\]
+
+Donc l'exposant de decroissance du skew implicite est le meme que celui du skew local."
 
 ### Ce que j'ecris au tableau
 
@@ -385,19 +280,19 @@ Donc la structure par terme du smile implicite herite directement de celle de \(
 
 ### Phrases d'intuition
 
-- "Intuitivement, l'exposant de decroissance est transmis du local vers l'implicite."
-- "Le point cle ici est que \(\alpha(t)\) ne controle pas seulement le niveau du skew, mais aussi sa structure par terme."
+- "Le point cle ici est que la structure par terme de l'implicite herite de celle de \(\alpha(t)\)."
+- "Le modele transporte donc directement l'information temporelle du skew local vers le skew implicite."
 
 ---
 
-## Slide 10 — Maturite courte : resultat exact
+## Slide 7 — Maturites courtes : resultat exact
 
 ### Temps cible
 1 min 15
 
 ### Ce que je dis
 
-"Enfin, Bergomi donne un resultat exact quand \(T\to 0\). Cette fois, ce n'est plus une approximation d'ordre 1. On a
+"Enfin, quand \(T\to 0\), Bergomi donne un resultat exact :
 \[
 \frac{1}{\hat{\sigma}(0,K)}
 =
@@ -405,9 +300,9 @@ Donc la structure par terme du smile implicite herite directement de celle de \(
 \int_{S_0}^{K}\frac{dS}{S\,\sigma_{\mathrm{loc}}(0,S)}.
 \]
 
-Donc, a tres courte maturite, l'inverse de la volatilite implicite est la moyenne harmonique de l'inverse de la local vol entre \(S_0\) et \(K\).
+Ce n'est donc pas une moyenne arithmetique de \(\sigma_{\mathrm{loc}}\), mais une moyenne harmonique de son inverse.
 
-C'est surprenant au debut, parce qu'on est habitues a voir des moyennes de variances. Mais ici il n'y a quasiment plus de moyenne temporelle : c'est la geometrie spatiale locale qui domine."
+C'est important parce qu'a tres courte maturite, il n'y a presque plus de moyenne temporelle : on lit une structure spatiale entre le spot initial et le strike."
 
 ### Ce que j'ecris au tableau
 
@@ -420,101 +315,87 @@ C'est surprenant au debut, parce qu'on est habitues a voir des moyennes de varia
 
 ### Phrases d'intuition
 
-- "Le point cle ici est que la bonne moyenne a courte maturite est harmonique, pas arithmetique."
-- "Si la local vol s'annule sur une zone a franchir, l'implicite doit aussi tendre vers zero : la formule le respecte naturellement."
+- "La bonne moyenne ici est harmonique, pas arithmetique."
+- "Si la local vol devient tres faible sur une zone a traverser, l'implicite courte maturite doit aussi refleter cette difficulte de passage."
 
 ---
 
-## Slide 11 — Conclusion, Dupire, stochastic volatility, limites
+## Slide 8 — A retenir : Dupire, stoch vol, limites
 
 ### Temps cible
 1 min
 
 ### Ce que je dis
 
-"Je termine par trois messages.
+"Je termine par trois idees.
 
-Premier message : Dupire donne l'aller, c'est-a-dire surface implicite vers local vol ; Bergomi etudie le retour local vol vers implicite et surtout la dynamique de smile induite.
+Premiere idee : Dupire fait le chemin de l'implicite vers la local vol ; ici on fait le chemin inverse.
 
-Deuxieme message : le parametre central est \(\alpha(t)\). Il controle le skew implicite, le mouvement a strike fixe, la dynamique ATMF et donc le ratio \(R_T\).
+Deuxieme idee : les formules d'ordre 1 sont tres utiles pour comprendre le skew, la courbure et le role de \(\alpha(t)\).
 
-Troisieme message : meme si ces formules sont tres utiles pour l'intuition et les asymptotiques, le modele local vol reste souvent trop rigide pour les smiles equity, ce qui motive l'interet des modeles de volatilite stochastique."
+Troisieme idee : cette approximation reste une approximation. Sur des smiles actions realistes, elle n'est pas suffisante pour obtenir des niveaux absolus tres precis.
+
+Donc le chapitre est extremement utile pour l'intuition et pour l'analyse theorique, mais il ne faut pas confondre cela avec une recette numerique parfaite."
 
 ### Ce que j'ecris au tableau
 
 \[
-\text{local vol} \Rightarrow \text{smile trop rigide}
-\]
-
-\[
-\alpha(t)\ \text{controle}\ \text{skew, ATMF, }R_T
+\text{Dupire : } \hat{\sigma}\to \sigma_{\mathrm{loc}}
+\qquad\text{et ici}\qquad
+\sigma_{\mathrm{loc}}\to \hat{\sigma}
 \]
 
 ### Phrases d'intuition
 
-- "Ce que cela signifie financierement, c'est qu'un bon fit instantane ne garantit pas une bonne dynamique de smile."
-- "La stochastic volatility est justement introduite pour assouplir cette dynamique."
+- "Le message central est : la local vol impose une structure au smile implicite."
+- "Mais les formules weak local vol restent des formules d'ordre 1."
 
 ---
 
-## Timing global
+## Timing total indicatif
 
 - Slide 1 : 0:50
-- Slide 2 : 1:10
-- Slide 3 : 1:05
+- Slide 2 : 1:15
+- Slide 3 : 1:10
 - Slide 4 : 0:55
-- Slide 5 : 1:10
-- Slide 6 : 1:00
-- Slide 7 : 1:05
-- Slide 8 : 1:10
-- Slide 9 : 0:55
-- Slide 10 : 1:15
-- Slide 11 : 1:00
+- Slide 5 : 1:20
+- Slide 6 : 0:55
+- Slide 7 : 1:15
+- Slide 8 : 1:00
 
-**Total cible : environ 10 min 45 s**
+Total brut : environ **8 minutes 40**.
 
----
+Avec :
+- transitions,
+- reprise orale de certaines formules,
+- une ou deux secondes de respiration entre slides,
 
-## Conseils de tableau
-
-Ne pas surcharger le tableau. Ecrire seulement :
-
-1. le SDE local vol au debut ;
-2. la formule de moyenne ponderee sur \(\hat{\sigma}^2\) ;
-3. la formule du skew implicite
-   \[
-   \left.\partial_{\ln K}\hat{\sigma}\right|_{ATMF}
-   =
-   \frac1T\int_0^T \frac{t}{T}\alpha(t)\,dt;
-   \]
-4. la formule de dynamique ATMF
-   \[
-   \frac{d\hat{\sigma}_{ATMF}}{d\ln S_0}
-   =
-   \frac1T\int_0^T \alpha(t)\,dt;
-   \]
-5. le ratio
-   \[
-   R_T=
-   \frac{\int_0^T \alpha(t)\,dt}
-   {\int_0^T \frac{t}{T}\alpha(t)\,dt};
-   \]
-6. le resultat exact a courte maturite.
+tu arrives naturellement autour de **10 minutes**, ce qui est coherent avec la repartition d'un expose a deux.
 
 ---
 
-## Si on me coupe et qu'il faut raccourcir
+## Tableau : minimum syndical a ecrire si on t'interrompt
 
-Supprimer ou raccourcir :
+Si tu dois absolument reduire l'ecriture au tableau, garde seulement :
 
-- slide 9 (loi de puissance),
-- une partie du detail sur la derivation weak-local-vol,
-- une partie de la conclusion.
+1. \[
+\hat{\sigma}_{K,T}^{\,2}
+=
+\frac{\mathbb E[\int_0^T w_t\,\sigma_{\mathrm{loc}}^2\,dt]}
+{\mathbb E[\int_0^T w_t\,dt]}
+\]
 
-Garder absolument :
+2. \[
+\left.\frac{\partial \hat{\sigma}_{K,T}}{\partial \ln K}\right|_{K=F_T}
+=
+\frac{1}{T}\int_0^T \frac{t}{T}\alpha(t)\,dt
+\]
 
-- moyenne ponderee,
-- role de \(\alpha(t)\),
-- dynamique ATMF,
-- \(R_T\),
-- resultat court terme.
+3. \[
+\frac{1}{\hat{\sigma}(0,K)}
+=
+\frac{1}{\ln(K/S_0)}
+\int_{S_0}^{K}\frac{dS}{S\,\sigma_{\mathrm{loc}}(0,S)}
+\]
+
+Ce sont les trois formules les plus defendables si on te demande le coeur mathematique du passage.
