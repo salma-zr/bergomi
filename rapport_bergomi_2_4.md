@@ -381,7 +381,166 @@ L'idee est :
 - figer la loi au premier ordre ;
 - garder seulement la contribution explicite de la perturbation.
 
-### 4.3. Formule approchee autour d'une vol constante
+### 4.3. Ce que veut dire "faiblement locale" en langage simple
+
+Le mot \emph{weakly local} peut sembler obscur si on le lit trop vite.
+
+Ce que Bergomi veut dire est simplement :
+
+> la dependance de la volatilite locale en fonction du spot est assez faible pour que l'on puisse faire un developpement perturbatif autour d'un modele plus simple.
+
+Autrement dit, on ne dit pas :
+
+- "la local vol est constante" ;
+- ni "la local vol ne depend presque pas du temps" ;
+
+mais plutot :
+
+- "la partie difficile, c'est sa dependance en \(S\)" ;
+- "on la traite comme une petite perturbation".
+
+Donc, conceptuellement :
+
+\[
+\sigma_{\mathrm{loc}}(t,S)
+=
+\underbrace{\sigma_0}_{\text{modele simple}}
++
+\underbrace{\delta\sigma(t,S)}_{\text{correction petite}}.
+\]
+
+Le modele simple, ici, est Black-Scholes de volatilite constante \(\sigma_0\).
+
+### 4.4. Quelle est l'idee mathematique exacte ?
+
+L'idee mathematique est une idee tres classique du cours :
+
+1. on part d'une formule exacte difficile ;
+2. on ecrit l'objet complique comme "objet simple + petite perturbation" ;
+3. on developpe a l'ordre 1 ;
+4. on jette les termes quadratiques et d'ordre superieur.
+
+Ici, l'objet complique est la fonction locale \(\sigma_{\mathrm{loc}}(t,S)\), ou plus proprement sa variance locale :
+
+\[
+u(t,S)=\sigma_{\mathrm{loc}}^2(t,S)=u_0(t)+\delta u(t,S).
+\]
+
+Le modele simple correspondant est un modele lognormal de reference, dans lequel les calculs de densite et de gamma se font explicitement.
+
+Le gain est enorme :
+
+- on perd de l'exactitude ;
+- mais on gagne une formule interpretable.
+
+### 4.5. Le vrai obstacle : qu'est-ce qui depend de la local vol ?
+
+Il faut bien voir que dans la formule exacte, la local vol intervient a deux endroits :
+
+1. **explicitement** dans le terme \(\sigma_{\mathrm{loc}}^2(t,S_t)\) du numerateur ;
+2. **implicitement** parce que la loi de \(S_t\) elle-meme depend du modele local vol.
+
+Et c'est justement cela qui rend la formule exacte difficile :
+
+- le poids n'est pas fixe ;
+- la densite des trajectoires n'est pas fixe ;
+- tout depend du modele local vol.
+
+L'approximation weak local vol consiste donc a dire :
+
+> au premier ordre, on peut calculer les poids et la densite dans le modele simple de reference, et ne garder la perturbation que dans le facteur explicite.
+
+### 4.6. Pourquoi dit-on qu'on "fige la densite" ?
+
+Supposons qu'on sache calculer facilement les esperances dans un modele simple de reference.
+
+Alors, au lieu de calculer exactement
+
+\[
+\mathbb E_{\mathrm{loc}}[\cdots],
+\]
+
+on remplace, a l'ordre 1, la loi compliquee par la loi du modele de reference.
+
+Ce n'est pas magique : c'est un developpement de perturbation.
+
+L'idee est :
+
+\[
+\mathbb E_{\mathrm{loc}}[\cdots]
+\approx
+\mathbb E_{0}[\cdots]
+\]
+
+pour la partie qui sert a calculer les poids, tant qu'on reste au premier ordre.
+
+### 4.7. Pourquoi la correction de densite disparait a l'ordre 1 ?
+
+C'est le point le plus subtil de cette section, et souvent celui qu'on ne comprend pas a la premiere lecture.
+
+La logique est la suivante.
+
+La formule exacte a la structure :
+
+\[
+\widehat{\sigma}_{K,T}^{\,2}
+=
+\frac{\mathbb E[(u_0+\delta u)\,\bullet]}{\mathbb E[\bullet]},
+\]
+
+ou \(\bullet\) designe schematiquement le poids gamma et l'integration en temps.
+
+Si tout dependait lineairement de \(\delta u\), on pourrait penser qu'il faut developper :
+
+- la perturbation explicite du numerateur ;
+- la perturbation de la loi dans le numerateur ;
+- la perturbation de la loi dans le denominateur.
+
+Mais, au premier ordre, les termes venant de la perturbation de la loi se compensent exactement entre numerateur et denominateur.
+
+Le mecanisme algebrique est celui-ci :
+
+si l'on ecrit
+
+\[
+\frac{A_0+\delta A}{B_0+\delta B}
+=
+\frac{A_0}{B_0}
++
+\frac{\delta A\,B_0-A_0\,\delta B}{B_0^2}
++
+O(\delta^2),
+\]
+
+et si, a l'ordre zero, on a
+
+\[
+A_0=u_0 B_0,
+\]
+
+alors
+
+\[
+\frac{\delta A\,B_0-A_0\,\delta B}{B_0^2}
+=
+\frac{\delta A-u_0\delta B}{B_0}.
+\]
+
+Or la partie de \(\delta A\) qui vient uniquement de la modification de la loi vaut exactement \(u_0\delta B\).
+
+Donc elle s'annule.
+
+Il reste seulement la contribution explicite de \(\delta u\).
+
+### 4.8. Qu'est-ce qu'il faut retenir de ce point technique ?
+
+Si tu veux une phrase simple a dire a l'oral :
+
+> au premier ordre, on peut calculer les poids et la densite dans le modele de reference ; la perturbation de la loi ne contribue pas independamment, elle se compense dans le quotient.
+
+C'est cela qui rend possible la formule analytique approchée.
+
+### 4.9. Formule approchee autour d'une vol constante
 
 Autour d'une vol constante \(\sigma_0\), Bergomi obtient :
 
@@ -407,7 +566,79 @@ x_K=\ln\!\left(\frac{K}{F_T}\right),
 \phi(y)=\frac{e^{-y^2/2}}{\sqrt{2\pi}}.
 \]
 
-### 4.4. Interpretation geometrique
+### 4.10. D'ou vient la variable \(y\) ?
+
+La variable \(y\) est une variable gaussienne centree reduite.
+
+Elle apparait quand on remplace la loi exacte compliquee de l'actif par la loi lognormale du modele de reference.
+
+Dans ce modele de reference :
+
+- le log-spot est gaussien ;
+- le conditionnement implicite entre la date \(0\) et la date \(T\) fait apparaitre une interpolation lineaire en log-moneyness ;
+- la partie aleatoire autour de cette interpolation est de type gaussien.
+
+C'est pour cela qu'on obtient une formule avec
+
+\[
+\int_{\mathbb R}\phi(y)\,\cdots\,dy.
+\]
+
+Donc \(y\) ne doit pas etre vu comme une nouvelle variable economique.
+
+Il faut plutot le voir comme :
+
+> la variable auxiliaire qui parametre les deviations gaussiennes autour du chemin central dans l'approximation lognormale.
+
+### 4.11. Que represente exactement \(x_K\) ?
+
+On pose
+
+\[
+x_K=\ln\!\left(\frac{K}{F_T}\right).
+\]
+
+C'est le **log-moneyness forward**.
+
+Interpretation :
+
+- si \(x_K=0\), on est au forward, donc a l'ATMF ;
+- si \(x_K<0\), le strike est en dessous du forward ;
+- si \(x_K>0\), le strike est au-dessus du forward.
+
+Cette variable est naturelle car le modele local vol est developpe autour du forward, pas autour du spot brut.
+
+### 4.12. Pourquoi la formule a cette tete ?
+
+Regardons
+
+\[
+S(t,y)=F_t\exp\!\Big(
+\frac{t}{T}x_K+\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y
+\Big).
+\]
+
+Cette formule se lit tres bien morceau par morceau :
+
+1. \(F_t\) = niveau central naturel a la date \(t\) ;
+2. \(\frac{t}{T}x_K\) = interpolation lineaire en log-espace entre la situation initiale et le strike final ;
+3. \(\sigma_0\sqrt{\frac{(T-t)t}{T}}\,y\) = dispersion gaussienne autour de ce chemin central.
+
+Le facteur
+
+\[
+\sqrt{\frac{(T-t)t}{T}}
+\]
+
+est tres important :
+
+- il vaut \(0\) a \(t=0\) ;
+- il vaut \(0\) a \(t=T\) ;
+- il est maximal au milieu.
+
+Donc les trajectoires alternatives sont "clouees" au point initial et au point final, et se dispersent surtout au milieu.
+
+### 4.13. Interpretation geometrique complete
 
 Cette formule dit :
 
@@ -425,7 +656,37 @@ decrit le spot intermediaire visite a la date \(t\).
 
 Si l'on garde seulement \(y=0\), on retient le chemin central, souvent interprete comme le "chemin le plus probable".
 
-### 4.5. Warning
+Autrement dit :
+
+- l'implicite est une moyenne en temps ;
+- et, pour chaque temps, une moyenne sur un faisceau de chemins gaussiens ;
+- le coeur de l'approximation est donc une **moyenne gaussienne de local vol**.
+
+### 4.14. Pourquoi la moyenne est-elle gaussienne ?
+
+Parce que le modele de reference est Black-Scholes.
+
+Dans Black-Scholes :
+
+- les incréments du log-prix sont gaussiens ;
+- la densite de transition est donc lognormale pour le prix ;
+- apres changement de variable, l'integration se ramene a une integration contre la densite normale standard \(\phi(y)\).
+
+Donc la gaussienne n'est pas arbitraire :
+
+> elle est la signature du fait qu'on calcule l'approximation autour d'un modele lognormal de reference.
+
+### 4.15. Ce qu'il faut absolument comprendre si on ne retient qu'une chose
+
+Si tu ne retiens qu'une seule idee sur l'approximation weak local vol, retiens celle-ci :
+
+> on remplace un probleme exact mais implicite et difficile par une moyenne gaussienne explicite de la local vol calculee dans un modele de reference Black-Scholes.
+
+Et si tu veux la dire encore plus simplement :
+
+> l'implicite est approximativement ce que l'on obtient en "moyennant" la local vol le long de chemins lognormaux reliant le spot initial au strike.
+
+### 4.16. Warning
 
 Cette formule est tres utile pour comprendre les derivations du skew.
 
